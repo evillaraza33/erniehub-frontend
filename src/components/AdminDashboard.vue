@@ -145,7 +145,7 @@
                 :key="idx" 
                 class="comment-item"
                 :class="{ 'comment-hidden': comment.isHidden }"
-                v-show="isAdmin || !comment.isHidden"
+                v-show="!comment.isHidden || isAdmin"
               >
                 <div class="comment-avatar">{{ getInitials(comment.username) }}</div>
                 <div class="comment-content-wrapper">
@@ -239,7 +239,7 @@
                 :key="idx" 
                 class="comment-item"
                 :class="{ 'comment-hidden': comment.isHidden }"
-                v-show="isAdmin || !comment.isHidden"
+                v-show="!comment.isHidden || isAdmin"
               >
                 <div class="comment-avatar">{{ getInitials(comment.username) }}</div>
                 <div class="comment-content-wrapper">
