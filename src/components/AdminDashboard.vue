@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container">
-    <!-- 💻 ADMIN Left Sidebar — EXTRA Menu Items + Profile! -->
+    <!-- 💻 ADMIN Left Sidebar — DESKTOP ONLY -->
     <aside class="dashboard-sidebar d-none d-md-flex admin-sidebar">
       <router-link to="/posts" class="sidebar-logo">
         <img :src="logo" alt="ErnieHub" />
@@ -38,9 +38,32 @@
       </div>
     </aside>
 
+    <!-- 📱 ADMIN MOBILE BOTTOM NAVIGATION — ✅ NEW! -->
+    <nav class="mobile-bottom-nav d-md-none">
+      <router-link to="/posts" class="mobile-nav-item">
+        <span class="mobile-nav-icon">🏠</span>
+        <span>Home</span>
+      </router-link>
+      <router-link to="/admin/users" class="mobile-nav-item">
+        <span class="mobile-nav-icon">👥</span>
+        <span>Users</span>
+      </router-link>
+      <router-link to="/create-post" class="mobile-nav-item create-btn">
+        <span class="plus-icon">+</span>
+      </router-link>
+      <router-link to="/admin/posts" class="mobile-nav-item">
+        <span class="mobile-nav-icon">📄</span>
+        <span>Posts</span>
+      </router-link>
+      <button @click="logout" class="mobile-nav-item logout-btn">
+        <span class="mobile-nav-icon">🚪</span>
+        <span>Logout</span>
+      </button>
+    </nav>
+
     <!-- 📄 MAIN CONTENT AREA -->
     <main class="dashboard-feed admin-feed">
-      <!-- 🏠 ADMIN HOME — Shows ALL Posts → ✅ ALREADY HAS IMAGES! -->
+      <!-- 🏠 ADMIN HOME — Shows ALL Posts -->
       <div v-if="activeView === 'home'">
         <h1 class="feed-title">All Posts</h1>
         <div v-if="loading" class="loading-text">Loading...</div>
@@ -127,7 +150,7 @@
         </div>
       </div>
 
-      <!-- 📄 ALL POSTS TAB → ✅ IMAGES ADDED! -->
+      <!-- 📄 ALL POSTS TAB -->
       <div v-if="activeView === 'posts'">
         <h1 class="feed-title">All Posts</h1>
         <p class="admin-subtitle">All public posts</p>
@@ -160,7 +183,6 @@
               </div>
             </div>
             <div class="post-content-text">{{ post.content }}</div>
-            <!-- ✅ IMAGE CODE ADDED -->
             <div v-if="post.imageUrl" class="post-image-container">
               <img :src="post.imageUrl" alt="Post" class="post-image" />
             </div>
@@ -176,7 +198,7 @@
         </div>
       </div>
 
-      <!-- 🙈 HIDDEN POSTS TAB → ✅ IMAGES ADDED! -->
+      <!-- 🙈 HIDDEN POSTS TAB -->
       <div v-if="activeView === 'hidden-posts'">
         <h1 class="feed-title">Hidden Posts</h1>
         <p class="admin-subtitle">Posts hidden from public view</p>
@@ -193,7 +215,6 @@
               <button class="admin-hide-btn hidden" @click="toggleHide(post._id, true)">👁️ Unhide</button>
             </div>
             <div class="post-content-text">{{ post.content }}</div>
-            <!-- ✅ IMAGE CODE ADDED -->
             <div v-if="post.imageUrl" class="post-image-container">
               <img :src="post.imageUrl" alt="Post" class="post-image" />
             </div>
@@ -204,7 +225,7 @@
         </div>
       </div>
 
-      <!-- 🔒 LOCKED COMMENTS TAB → ✅ IMAGES ADDED! -->
+      <!-- 🔒 LOCKED COMMENTS TAB -->
       <div v-if="activeView === 'locked-comments'">
         <h1 class="feed-title">Locked Comments</h1>
         <p class="admin-subtitle">Posts where comments are currently locked</p>
@@ -222,7 +243,6 @@
               <button class="admin-lock-btn locked" @click="toggleLock(post._id, true)">🔓 Unlock Comments</button>
             </div>
             <div class="post-content-text">{{ post.content }}</div>
-            <!-- ✅ IMAGE CODE ADDED -->
             <div v-if="post.imageUrl" class="post-image-container">
               <img :src="post.imageUrl" alt="Post" class="post-image" />
             </div>
@@ -266,6 +286,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import logo from '/src/assets/logo.png'
+
 const router = useRouter()
 const route = useRoute()
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
@@ -302,6 +323,7 @@ const filteredUsers = computed(() => {
     return name.includes(searchUser.value.toLowerCase()) && !u.isBlocked
   })
 })
+
 const hiddenPosts = computed(() => allPosts.value.filter(p => p.isHidden))
 const blockedUsers = computed(() => allUsers.value.filter(u => u.isBlocked))
 
@@ -310,6 +332,7 @@ const getInitials = (name) => {
   if (!name) return 'U'
   return name.charAt(0).toUpperCase()
 }
+
 const formatTime = (dateStr) => {
   if (!dateStr) return ''
   const date = new Date(dateStr)
@@ -344,13 +367,10 @@ const fetchAllData = async () => {
   loading.value = false
 }
 
-// ✅ LOCK/UNLOCK — NO SCROLL JUMP! Update locally first
+// ✅ LOCK/UNLOCK — NO SCROLL JUMP!
 const toggleLock = async (postId, currentState) => {
-  // 🔍 Find the post & UPDATE LOCALLY first
   const post = allPosts.value.find(p => p._id === postId);
-  if (post) post.isLocked = !post.isLocked; // ✅ Instant update!
-
-  // ✅ Send to server in BACKGROUND — NO reload!
+  if (post) post.isLocked = !post.isLocked;
   try {
     await fetch(`${API_URL}/posts/lock/${postId}`, {
       method: 'PATCH',
@@ -359,21 +379,16 @@ const toggleLock = async (postId, currentState) => {
         'Content-Type': 'application/json'
       }
     });
-    // ✅ Server confirmed — NO REFRESH NEEDED!
   } catch (err) {
-    // ❌ Revert if failed
     if (post) post.isLocked = currentState;
     alert('Action failed!');
   }
 };
 
-// ✅ HIDE/UNHIDE — NO SCROLL JUMP! Update locally first
+// ✅ HIDE/UNHIDE — NO SCROLL JUMP!
 const toggleHide = async (postId, currentState) => {
-  // 🔍 Find the post & UPDATE LOCALLY first
   const post = allPosts.value.find(p => p._id === postId);
-  if (post) post.isHidden = !post.isHidden; // ✅ Instant update!
-
-  // ✅ Send to server in BACKGROUND — NO reload!
+  if (post) post.isHidden = !post.isHidden;
   try {
     await fetch(`${API_URL}/posts/hide/${postId}`, {
       method: 'PATCH',
@@ -382,9 +397,7 @@ const toggleHide = async (postId, currentState) => {
         'Content-Type': 'application/json'
       }
     });
-    // ✅ Server confirmed — NO REFRESH NEEDED!
   } catch (err) {
-    // ❌ Revert if failed
     if (post) post.isHidden = currentState;
     alert('Action failed!');
   }
@@ -393,11 +406,13 @@ const toggleHide = async (postId, currentState) => {
 const toggleBlockUser = async (userId, currentState) => {
   alert('Block user route coming soon! 🚀')
 }
+
 const logout = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('user')
   router.push('/login')
 }
+
 const comingSoon = () => {
   alert('This feature is coming soon! 🚀')
 }

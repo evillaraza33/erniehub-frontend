@@ -2104,3 +2104,16 @@ textarea.post-textarea {
   color: #ffffff;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
 }
+
+/* ✅ Mobile Logout Button */
+.logout-btn {
+  color: #E0245E !important; /* Twitter red — matches your theme! */
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  color: #ff477e !important;
+  background: rgba(224, 36, 94, 0.1);
+}

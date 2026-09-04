@@ -192,6 +192,10 @@
         <span class="mobile-nav-icon">👤</span>
         <span class="mobile-nav-label">Profile</span>
       </router-link>
+      <button @click="logout" class="mobile-nav-item logout-btn">
+        <span class="mobile-nav-icon">➡️</span>
+        <span>Logout</span>
+      </button>
     </nav>
   </div>
 </template>
