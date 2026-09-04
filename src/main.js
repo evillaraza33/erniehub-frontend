@@ -15,21 +15,23 @@ import AdminDashboard from './components/AdminDashboard.vue'
 const routes = [
   { path: '/register', component: Register },
   { path: '/login', component: Login },
-  { path: '/posts', component: Dashboard },           // ✅ Regular user
+  
+  // 👤 REGULAR USER routes → load Dashboard.vue
+  { path: '/posts', component: Dashboard },           // ✅ Regular user timeline
   { path: '/my-posts', component: MyPosts },
   { path: '/create-post', component: CreatePost },
   { path: '/edit-post/:id', component: EditPost },
-  { path: '/profile', component: Profile },            
-  
-  // ✅ ADMIN ROUTES — NOW POINT TO ADMINDASHBOARD!
-  { path: '/admin', component: AdminDashboard },      // ✅ NO REDIRECT!
+  { path: '/profile', component: Profile },
+
+  // 🛡️ ADMIN routes → load AdminDashboard.vue
+  { path: '/admin', component: AdminDashboard },              // ✅ NO REDIRECT!
   { path: '/admin/users', component: AdminDashboard },
   { path: '/admin/posts', component: AdminDashboard },
   { path: '/admin/hidden-posts', component: AdminDashboard },
   { path: '/admin/hidden-users', component: AdminDashboard },
   { path: '/admin/locked-comments', component: AdminDashboard },
-  
-  { path: '/', redirect: '/posts' }                    // ✅ Default → regular timeline
+
+  { path: '/', redirect: '/posts' }
 ]
 
 const router = createRouter({

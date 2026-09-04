@@ -2,11 +2,13 @@
   <div class="dashboard-container">
     <!-- 💻 ADMIN Left Sidebar — DESKTOP ONLY -->
     <aside class="dashboard-sidebar d-none d-md-flex admin-sidebar">
-      <router-link to="/posts" class="sidebar-logo">
+      <!-- ✅ FIX 1: Logo links to /admin NOT /posts -->
+      <router-link to="/admin" class="sidebar-logo">
         <img :src="logo" alt="ErnieHub" />
       </router-link>
       <nav class="sidebar-nav">
-        <router-link to="/posts" class="nav-item" :class="{ active: $route.path === '/posts' }">
+        <!-- ✅ FIX 2: Home links to /admin NOT /posts -->
+        <router-link to="/admin" class="nav-item" :class="{ active: $route.path === '/admin' }">
           <span class="nav-icon">🏠</span> Home
         </router-link>
         <router-link to="/admin/users" class="nav-item" :class="{ active: activeView === 'users' }">
@@ -40,7 +42,8 @@
 
     <!-- 📱 ADMIN MOBILE BOTTOM NAVIGATION → ✅ ADMIN-SPECIFIC MENU! -->
     <nav class="mobile-bottom-nav d-md-none">
-      <router-link to="/posts" class="mobile-nav-item">
+      <!-- ✅ FIX 3: Mobile Home links to /admin NOT /posts -->
+      <router-link to="/admin" class="mobile-nav-item">
         <span class="mobile-nav-icon">🏠</span>
         <span>Home</span>
       </router-link>
@@ -332,7 +335,6 @@ const filteredUsers = computed(() => {
     return name.includes(searchUser.value.toLowerCase()) && !u.isBlocked
   })
 })
-
 const hiddenPosts = computed(() => allPosts.value.filter(p => p.isHidden))
 const blockedUsers = computed(() => allUsers.value.filter(u => u.isBlocked))
 
@@ -341,7 +343,6 @@ const getInitials = (name) => {
   if (!name) return 'U'
   return name.charAt(0).toUpperCase()
 }
-
 const formatTime = (dateStr) => {
   if (!dateStr) return ''
   const date = new Date(dateStr)
