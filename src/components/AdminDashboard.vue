@@ -114,7 +114,7 @@
               <span v-if="post.isHidden" class="badge-hidden">🙈 Hidden from Public</span>
             </div>
 
-            <!-- ✅ LIKE & COMMENT — NOW CLICKABLE! -->
+            <!-- ✅ LIKE & COMMENT BUTTONS -->
             <div class="post-actions">
               <button class="action-btn-like" @click="toggleLike(post._id)">
                 ❤️ {{ post.likes?.length || 0 }}
@@ -138,15 +138,33 @@
               </div>
             </div>
 
-            <!-- ✅ COMMENTS LIST -->
+            <!-- ✅ COMMENTS LIST — ADMIN SEES ALL (including hidden!) + TOGGLE BUTTON -->
             <div v-if="post.comments?.length > 0" class="comments-section">
-              <div v-for="(comment, idx) in post.comments" :key="idx" class="comment-item" v-show="!comment.isHidden">
-                <div class="comment-author">{{ comment.username || 'User' }}</div>
-                <div class="comment-text">{{ comment.content }}</div>
-                <div class="comment-time">{{ formatTime(comment.createdAt) }}</div>
-                <button class="admin-hide-btn comment-hide-btn" @click="toggleCommentVisibility(post._id, idx, comment.isHidden)">
-                  {{ comment.isHidden ? '👁️' : '🙈' }}
-                </button>
+              <div 
+                v-for="(comment, idx) in post.comments" 
+                :key="idx" 
+                class="comment-item"
+                :class="{ 'comment-hidden': comment.isHidden }"
+                v-show="isAdmin || !comment.isHidden"
+              >
+                <div class="comment-avatar">{{ getInitials(comment.username) }}</div>
+                <div class="comment-content-wrapper">
+                  <div class="comment-header-row">
+                    <span class="comment-author-name">{{ comment.username || 'User' }}</span>
+                    <span class="comment-dot">·</span>
+                    <span class="comment-time">{{ formatTime(comment.createdAt) }}</span>
+                    <!-- ✅ ONLY ADMIN SEES THIS BUTTON — ICON CHANGES! -->
+                    <button 
+                      v-if="isAdmin"
+                      class="comment-hide-icon" 
+                      @click="toggleCommentVisibility(post._id, idx, comment.isHidden)"
+                      :title="comment.isHidden ? '👁️ Unhide Comment' : '🙈 Hide Comment'"
+                    >
+                      {{ comment.isHidden ? '👁️' : '🙈' }}
+                    </button>
+                  </div>
+                  <p class="comment-text-body">{{ comment.content }}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -195,7 +213,7 @@
               <span v-if="post.isHidden" class="badge-hidden">🙈 Hidden</span>
             </div>
 
-            <!-- ✅ LIKE & COMMENT — ALSO HERE! -->
+            <!-- ✅ LIKE & COMMENT BUTTONS -->
             <div class="post-actions">
               <button class="action-btn-like" @click="toggleLike(post._id)">
                 ❤️ {{ post.likes?.length || 0 }}
@@ -205,7 +223,7 @@
               </button>
             </div>
 
-            <!-- ✅ COMMENT INPUT & LIST -->
+            <!-- ✅ COMMENT INPUT AREA -->
             <div v-if="showCommentInput[post._id]" class="comment-input-area">
               <textarea v-model="commentText[post._id]" class="comment-textarea" placeholder="Write a comment..."></textarea>
               <div class="comment-buttons">
@@ -213,14 +231,33 @@
                 <button class="submit-btn" @click="submitComment(post._id)">Post Comment</button>
               </div>
             </div>
+
+            <!-- ✅ COMMENTS LIST — SAME TOGGLE FUNCTIONALITY -->
             <div v-if="post.comments?.length > 0" class="comments-section">
-              <div v-for="(comment, idx) in post.comments" :key="idx" class="comment-item" v-show="!comment.isHidden">
-                <div class="comment-author">{{ comment.username || 'User' }}</div>
-                <div class="comment-text">{{ comment.content }}</div>
-                <div class="comment-time">{{ formatTime(comment.createdAt) }}</div>
-                <button class="admin-hide-btn comment-hide-btn" @click="toggleCommentVisibility(post._id, idx, comment.isHidden)">
-                  {{ comment.isHidden ? '👁️' : '🙈' }}
-                </button>
+              <div 
+                v-for="(comment, idx) in post.comments" 
+                :key="idx" 
+                class="comment-item"
+                :class="{ 'comment-hidden': comment.isHidden }"
+                v-show="isAdmin || !comment.isHidden"
+              >
+                <div class="comment-avatar">{{ getInitials(comment.username) }}</div>
+                <div class="comment-content-wrapper">
+                  <div class="comment-header-row">
+                    <span class="comment-author-name">{{ comment.username || 'User' }}</span>
+                    <span class="comment-dot">·</span>
+                    <span class="comment-time">{{ formatTime(comment.createdAt) }}</span>
+                    <button 
+                      v-if="isAdmin"
+                      class="comment-hide-icon" 
+                      @click="toggleCommentVisibility(post._id, idx, comment.isHidden)"
+                      :title="comment.isHidden ? '👁️ Unhide Comment' : '🙈 Hide Comment'"
+                    >
+                      {{ comment.isHidden ? '👁️' : '🙈' }}
+                    </button>
+                  </div>
+                  <p class="comment-text-body">{{ comment.content }}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -344,6 +381,7 @@ const route = useRoute()
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
 const token = ref(localStorage.getItem('token') || '')
 const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
+const isAdmin = ref(!!currentUser?.isAdmin) // ✅ ADMIN CHECK
 
 // ✅ Tab navigation
 const activeView = computed(() => {
@@ -492,10 +530,12 @@ const submitComment = async (postId) => {
   }
 }
 
-// ✅ ADMIN CAN HIDE COMMENTS
+// ✅ ADMIN CAN HIDE/UNHIDE COMMENTS
 const toggleCommentVisibility = async (postId, commentIndex, currentHidden) => {
   const post = allPosts.value.find(p => p._id === postId)
   if (!post || !post.comments[commentIndex]) return
+  
+  // ✅ Toggle locally FIRST — instant visual feedback!
   post.comments[commentIndex].isHidden = !currentHidden
 
   try {
@@ -507,6 +547,7 @@ const toggleCommentVisibility = async (postId, commentIndex, currentHidden) => {
       }
     })
   } catch (err) {
+    // Rollback on error
     post.comments[commentIndex].isHidden = currentHidden
     alert('Action failed!')
   }

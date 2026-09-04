@@ -2179,3 +2179,146 @@ textarea.post-textarea {
 .submit-btn:hover {
   background: #1a8cd8;
 }
+
+/* ======================================
+   💬 COMMENTS — CLEAN TWITTER LAYOUT
+   ====================================== */
+.comments-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eff3f4;
+}
+
+.comment-item {
+  display: flex;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f7f9fa;
+}
+
+.comment-avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #1d9bf0;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.comment-content-wrapper {
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-header-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.comment-author-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #0f1419;
+}
+
+.comment-dot {
+  color: #7b8690;
+  font-size: 13px;
+}
+
+.comment-time {
+  font-size: 13px;
+  color: #7b8690;
+}
+
+.comment-hide-icon {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 12px;
+  opacity: 0.6;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+.comment-hide-icon:hover {
+  opacity: 1;
+  background: #f7f9fa;
+}
+
+.comment-text-body {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #0f1419;
+  word-wrap: break-word;
+}
+
+/* Comment Input & Buttons */
+.comment-input-area {
+  margin: 12px 0;
+  padding: 12px;
+  background: #f7f9fa;
+  border-radius: 16px;
+  border: 1px solid #eff3f4;
+}
+
+.comment-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border: 1px solid #eff3f4;
+  border-radius: 12px;
+  resize: none;
+  font-size: 15px;
+  margin-bottom: 12px;
+  background: white;
+}
+
+.comment-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  align-items: center;
+}
+
+.cancel-btn {
+  padding: 8px 20px;
+  border: 1px solid #cfd9de;
+  background: white;
+  color: #0f1419;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cancel-btn:hover {
+  background: #f7f9fa;
+}
+
+.submit-btn {
+  padding: 8px 20px;
+  border: none;
+  background: #1d9bf0;
+  color: white;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.submit-btn:hover {
+  background: #1a8cd8;
+}
