@@ -2117,3 +2117,65 @@ textarea.post-textarea {
   color: #ff477e !important;
   background: rgba(224, 36, 94, 0.1);
 }
+
+/* ======================================
+   💬 COMMENT INPUT & BUTTONS — CLEAN LAYOUT
+   ====================================== */
+.comment-input-area {
+  margin: 12px 0;
+  padding: 12px;
+  background: #f7f9fa;
+  border-radius: 16px;
+  border: 1px solid #eff3f4;
+}
+
+.comment-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border: 1px solid #eff3f4;
+  border-radius: 12px;
+  resize: none;
+  font-size: 15px;
+  margin-bottom: 12px;
+  background: white;
+}
+
+.comment-buttons {
+  display: flex;
+  justify-content: flex-end; /* ✅ Push buttons to the RIGHT */
+  gap: 10px; /* ✅ Space between buttons */
+  align-items: center;
+}
+
+.cancel-btn {
+  padding: 8px 20px;
+  border: 1px solid #cfd9de;
+  background: white;
+  color: #0f1419;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cancel-btn:hover {
+  background: #f7f9fa;
+}
+
+.submit-btn {
+  padding: 8px 20px;
+  border: none;
+  background: #1d9bf0; /* ✅ Twitter Blue */
+  color: white;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.submit-btn:hover {
+  background: #1a8cd8;
+}

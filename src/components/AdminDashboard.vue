@@ -2,12 +2,10 @@
   <div class="dashboard-container">
     <!-- 💻 ADMIN Left Sidebar — DESKTOP ONLY -->
     <aside class="dashboard-sidebar d-none d-md-flex admin-sidebar">
-      <!-- ✅ FIX 1: Logo links to /admin NOT /posts -->
       <router-link to="/admin" class="sidebar-logo">
         <img :src="logo" alt="ErnieHub" />
       </router-link>
       <nav class="sidebar-nav">
-        <!-- ✅ FIX 2: Home links to /admin NOT /posts -->
         <router-link to="/admin" class="nav-item" :class="{ active: $route.path === '/admin' }">
           <span class="nav-icon">🏠</span> Home
         </router-link>
@@ -40,9 +38,8 @@
       </div>
     </aside>
 
-    <!-- 📱 ADMIN MOBILE BOTTOM NAVIGATION → ✅ ADMIN-SPECIFIC MENU! -->
+    <!-- 📱 ADMIN MOBILE BOTTOM NAVIGATION -->
     <nav class="mobile-bottom-nav d-md-none">
-      <!-- ✅ FIX 3: Mobile Home links to /admin NOT /posts -->
       <router-link to="/admin" class="mobile-nav-item">
         <span class="mobile-nav-icon">🏠</span>
         <span>Home</span>
@@ -75,7 +72,7 @@
 
     <!-- 📄 MAIN CONTENT AREA -->
     <main class="dashboard-feed admin-feed">
-      <!-- 🏠 ADMIN HOME — Shows ALL Posts -->
+      <!-- 🏠 ADMIN HOME -->
       <div v-if="activeView === 'home'">
         <h1 class="feed-title">All Posts</h1>
         <div v-if="loading" class="loading-text">Loading...</div>
@@ -116,50 +113,45 @@
               <span v-if="post.isLocked" class="badge-locked">🔒 Comments Locked</span>
               <span v-if="post.isHidden" class="badge-hidden">🙈 Hidden from Public</span>
             </div>
+
+            <!-- ✅ LIKE & COMMENT — NOW CLICKABLE! -->
             <div class="post-actions">
-              <button class="action-btn-like">❤️ {{ post.likes?.length || 0 }}</button>
-              <button class="action-btn-comment">💬 {{ post.comments?.length || 0 }}</button>
+              <button class="action-btn-like" @click="toggleLike(post._id)">
+                ❤️ {{ post.likes?.length || 0 }}
+              </button>
+              <button class="action-btn-comment" @click="toggleCommentInput(post._id)">
+                💬 {{ post.comments?.length || 0 }}
+              </button>
               <button class="action-btn-share" @click="comingSoon">🔁 Share</button>
             </div>
-          </div>
-        </div>
-        <div v-else class="empty-state">
-          <p>No posts yet.</p>
-        </div>
-      </div>
 
-      <!-- 👥 ALL USERS TAB -->
-      <div v-if="activeView === 'users'">
-        <div class="admin-header-bar">
-          <h1 class="feed-title">All Users</h1>
-          <input 
-            v-model="searchUser" 
-            type="text" 
-            class="admin-search-input" 
-            placeholder="🔍 Search users..."
-          />
-        </div>
-        <div v-if="loading" class="loading-text">Loading users...</div>
-        <div v-else class="users-list">
-          <div v-for="user in filteredUsers" :key="user._id" class="user-list-item">
-            <div class="user-avatar-small">{{ getInitials(user.username || user.name) }}</div>
-            <div class="user-info">
-              <div class="user-name">{{ user.username || user.name || 'User' }}</div>
-              <div class="user-handle">@{{ user.username || 'user' }}</div>
-              <div class="user-stats-small">{{ user.postCount || 0 }} posts</div>
+            <!-- ✅ COMMENT INPUT AREA -->
+            <div v-if="showCommentInput[post._id]" class="comment-input-area">
+              <textarea
+                v-model="commentText[post._id]"
+                class="comment-textarea"
+                placeholder="Write a comment..."
+              ></textarea>
+              <div class="comment-buttons">
+                <button class="cancel-btn" @click="showCommentInput[post._id] = false">Cancel</button>
+                <button class="submit-btn" @click="submitComment(post._id)">Post Comment</button>
+              </div>
             </div>
-            <div class="user-actions">
-              <button 
-                class="block-user-btn" 
-                :class="{ blocked: user.isBlocked }"
-                @click="toggleBlockUser(user._id, user.isBlocked)"
-                :title="user.isBlocked ? 'Unblock User' : 'Block User'"
-              >
-                {{ user.isBlocked ? '✅' : '🚫' }}
-              </button>
+
+            <!-- ✅ COMMENTS LIST -->
+            <div v-if="post.comments?.length > 0" class="comments-section">
+              <div v-for="(comment, idx) in post.comments" :key="idx" class="comment-item" v-show="!comment.isHidden">
+                <div class="comment-author">{{ comment.username || 'User' }}</div>
+                <div class="comment-text">{{ comment.content }}</div>
+                <div class="comment-time">{{ formatTime(comment.createdAt) }}</div>
+                <button class="admin-hide-btn comment-hide-btn" @click="toggleCommentVisibility(post._id, idx, comment.isHidden)">
+                  {{ comment.isHidden ? '👁️' : '🙈' }}
+                </button>
+              </div>
             </div>
           </div>
         </div>
+        <div v-else class="empty-state"><p>No posts yet.</p></div>
       </div>
 
       <!-- 📄 ALL POSTS TAB -->
@@ -202,9 +194,63 @@
               <span v-if="post.isLocked" class="badge-locked">🔒 Locked</span>
               <span v-if="post.isHidden" class="badge-hidden">🙈 Hidden</span>
             </div>
+
+            <!-- ✅ LIKE & COMMENT — ALSO HERE! -->
             <div class="post-actions">
-              <span class="action-btn-like">❤️ {{ post.likes?.length || 0 }}</span>
-              <span class="action-btn-comment">💬 {{ post.comments?.length || 0 }}</span>
+              <button class="action-btn-like" @click="toggleLike(post._id)">
+                ❤️ {{ post.likes?.length || 0 }}
+              </button>
+              <button class="action-btn-comment" @click="toggleCommentInput(post._id)">
+                💬 {{ post.comments?.length || 0 }}
+              </button>
+            </div>
+
+            <!-- ✅ COMMENT INPUT & LIST -->
+            <div v-if="showCommentInput[post._id]" class="comment-input-area">
+              <textarea v-model="commentText[post._id]" class="comment-textarea" placeholder="Write a comment..."></textarea>
+              <div class="comment-buttons">
+                <button class="cancel-btn" @click="showCommentInput[post._id] = false">Cancel</button>
+                <button class="submit-btn" @click="submitComment(post._id)">Post Comment</button>
+              </div>
+            </div>
+            <div v-if="post.comments?.length > 0" class="comments-section">
+              <div v-for="(comment, idx) in post.comments" :key="idx" class="comment-item" v-show="!comment.isHidden">
+                <div class="comment-author">{{ comment.username || 'User' }}</div>
+                <div class="comment-text">{{ comment.content }}</div>
+                <div class="comment-time">{{ formatTime(comment.createdAt) }}</div>
+                <button class="admin-hide-btn comment-hide-btn" @click="toggleCommentVisibility(post._id, idx, comment.isHidden)">
+                  {{ comment.isHidden ? '👁️' : '🙈' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 👥 ALL USERS TAB -->
+      <div v-if="activeView === 'users'">
+        <div class="admin-header-bar">
+          <h1 class="feed-title">All Users</h1>
+          <input v-model="searchUser" type="text" class="admin-search-input" placeholder="🔍 Search users..." />
+        </div>
+        <div v-if="loading" class="loading-text">Loading users...</div>
+        <div v-else class="users-list">
+          <div v-for="user in filteredUsers" :key="user._id" class="user-list-item">
+            <div class="user-avatar-small">{{ getInitials(user.username || user.name) }}</div>
+            <div class="user-info">
+              <div class="user-name">{{ user.username || user.name || 'User' }}</div>
+              <div class="user-handle">@{{ user.username || 'user' }}</div>
+              <div class="user-stats-small">{{ user.postCount || 0 }} posts</div>
+            </div>
+            <div class="user-actions">
+              <button 
+                class="block-user-btn" 
+                :class="{ blocked: user.isBlocked }"
+                @click="toggleBlockUser(user._id, user.isBlocked)"
+                :title="user.isBlocked ? 'Unblock User' : 'Block User'"
+              >
+                {{ user.isBlocked ? '✅' : '🚫' }}
+              </button>
             </div>
           </div>
         </div>
@@ -232,9 +278,7 @@
             </div>
           </div>
         </div>
-        <div v-else class="empty-state">
-          <p>No hidden posts! 🎉</p>
-        </div>
+        <div v-else class="empty-state"><p>No hidden posts! 🎉</p></div>
       </div>
 
       <!-- 🔒 LOCKED COMMENTS TAB -->
@@ -266,9 +310,7 @@
             </div>
           </div>
         </div>
-        <div v-else class="empty-state">
-          <p>No locked comments! 🎉</p>
-        </div>
+        <div v-else class="empty-state"><p>No locked comments! 🎉</p></div>
       </div>
 
       <!-- 🚫 BLOCKED USERS TAB -->
@@ -286,9 +328,7 @@
             <button class="block-user-btn blocked" @click="toggleBlockUser(user._id, true)">✅ Unblock</button>
           </div>
         </div>
-        <div v-else class="empty-state">
-          <p>No blocked users! 🎉</p>
-        </div>
+        <div v-else class="empty-state"><p>No blocked users! 🎉</p></div>
       </div>
     </main>
   </div>
@@ -303,6 +343,7 @@ const router = useRouter()
 const route = useRoute()
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
 const token = ref(localStorage.getItem('token') || '')
+const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
 
 // ✅ Tab navigation
 const activeView = computed(() => {
@@ -317,10 +358,12 @@ const activeView = computed(() => {
   return 'home'
 })
 
+// ✅ Like & Comment support
+const showCommentInput = ref({})
+const commentText = ref({})
+
 // ✅ Filter posts that have comments LOCKED
-const lockedPosts = computed(() => {
-  return allPosts.value.filter(post => post.isLocked)
-})
+const lockedPosts = computed(() => allPosts.value.filter(post => post.isLocked))
 
 const searchUser = ref('')
 const allPosts = ref([])
@@ -361,26 +404,118 @@ const fetchAllData = async () => {
       headers: { 'Authorization': `Bearer ${token.value}` }
     })
     const postsData = await postsRes.json()
-    if (postsRes.ok) {
-      allPosts.value = postsData.posts || postsData || []
-    }
+    if (postsRes.ok) allPosts.value = postsData.posts || postsData || []
+
     const usersRes = await fetch(`${API_URL}/users/all`, {
       headers: { 'Authorization': `Bearer ${token.value}` }
     })
     const usersData = await usersRes.json()
-    if (usersRes.ok) {
-      allUsers.value = usersData.users || usersData || []
-    }
+    if (usersRes.ok) allUsers.value = usersData.users || usersData || []
   } catch (err) {
     console.error('Admin dashboard error:', err)
   }
   loading.value = false
 }
 
-// ✅ LOCK/UNLOCK — NO SCROLL JUMP!
+// ✅ TOGGLE LIKE — ADMIN CAN LIKE!
+const toggleLike = async (postId) => {
+  const post = allPosts.value.find(p => p._id === postId)
+  if (!post) return
+  const userId = currentUser._id
+  const hasLiked = post.likes?.includes(userId)
+
+  // Update locally first
+  if (hasLiked) {
+    post.likes = post.likes.filter(id => id !== userId)
+  } else {
+    if (!post.likes) post.likes = []
+    post.likes.push(userId)
+  }
+
+  try {
+    await fetch(`${API_URL}/posts/like/${postId}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token.value}`,
+        'Content-Type': 'application/json'
+      }
+    })
+  } catch (err) {
+    // Rollback
+    if (hasLiked) post.likes.push(userId)
+    else post.likes = post.likes.filter(id => id !== userId)
+    alert('Like failed!')
+  }
+}
+
+// ✅ SHOW/HIDE COMMENT INPUT
+const toggleCommentInput = (postId) => {
+  showCommentInput.value[postId] = !showCommentInput.value[postId]
+}
+
+// ✅ SUBMIT COMMENT — ADMIN CAN COMMENT!
+const submitComment = async (postId) => {
+  const text = commentText.value[postId]?.trim()
+  if (!text) return
+
+  const tempComment = {
+    content: text,
+    userId: currentUser._id,
+    username: currentUser.username,
+    createdAt: new Date().toISOString(),
+    isHidden: false
+  }
+
+  // Update locally
+  const post = allPosts.value.find(p => p._id === postId)
+  if (post) {
+    if (!post.comments) post.comments = []
+    post.comments.push(tempComment)
+  }
+
+  // Clear & hide
+  commentText.value[postId] = ''
+  showCommentInput.value[postId] = false
+
+  try {
+    await fetch(`${API_URL}/posts/comment/${postId}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token.value}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ content: text })
+    })
+  } catch (err) {
+    if (post) post.comments.pop()
+    alert('Comment failed!')
+  }
+}
+
+// ✅ ADMIN CAN HIDE COMMENTS
+const toggleCommentVisibility = async (postId, commentIndex, currentHidden) => {
+  const post = allPosts.value.find(p => p._id === postId)
+  if (!post || !post.comments[commentIndex]) return
+  post.comments[commentIndex].isHidden = !currentHidden
+
+  try {
+    await fetch(`${API_URL}/posts/toggle-comment-hidden/${postId}/${commentIndex}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token.value}`,
+        'Content-Type': 'application/json'
+      }
+    })
+  } catch (err) {
+    post.comments[commentIndex].isHidden = currentHidden
+    alert('Action failed!')
+  }
+}
+
+// ✅ LOCK/UNLOCK POST COMMENTS
 const toggleLock = async (postId, currentState) => {
-  const post = allPosts.value.find(p => p._id === postId);
-  if (post) post.isLocked = !post.isLocked;
+  const post = allPosts.value.find(p => p._id === postId)
+  if (post) post.isLocked = !post.isLocked
   try {
     await fetch(`${API_URL}/posts/lock/${postId}`, {
       method: 'PATCH',
@@ -388,17 +523,17 @@ const toggleLock = async (postId, currentState) => {
         'Authorization': `Bearer ${token.value}`,
         'Content-Type': 'application/json'
       }
-    });
+    })
   } catch (err) {
-    if (post) post.isLocked = currentState;
-    alert('Action failed!');
+    if (post) post.isLocked = currentState
+    alert('Action failed!')
   }
-};
+}
 
-// ✅ HIDE/UNHIDE — NO SCROLL JUMP!
+// ✅ HIDE/UNHIDE POST
 const toggleHide = async (postId, currentState) => {
-  const post = allPosts.value.find(p => p._id === postId);
-  if (post) post.isHidden = !post.isHidden;
+  const post = allPosts.value.find(p => p._id === postId)
+  if (post) post.isHidden = !post.isHidden
   try {
     await fetch(`${API_URL}/posts/hide/${postId}`, {
       method: 'PATCH',
@@ -406,23 +541,21 @@ const toggleHide = async (postId, currentState) => {
         'Authorization': `Bearer ${token.value}`,
         'Content-Type': 'application/json'
       }
-    });
+    })
   } catch (err) {
-    if (post) post.isHidden = currentState;
-    alert('Action failed!');
+    if (post) post.isHidden = currentState
+    alert('Action failed!')
   }
-};
+}
 
 const toggleBlockUser = async (userId, currentState) => {
   alert('Block user route coming soon! 🚀')
 }
-
 const logout = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('user')
   router.push('/login')
 }
-
 const comingSoon = () => {
   alert('This feature is coming soon! 🚀')
 }
