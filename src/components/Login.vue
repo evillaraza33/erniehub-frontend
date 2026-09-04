@@ -41,10 +41,8 @@
         </p>
       </div>
     </div>
-
-    <!-- ✅ RIGHT SIDE — Hero Section WITH YOUR IMAGE BACKGROUND -->
+    <!-- ✅ RIGHT SIDE — Hero Section -->
     <div class="login-hero-section">
-      <!-- ✅ Your beautiful image as background -->
       <div class="hero-image-bg"></div>
       <div class="hero-content">
         <h2 class="hero-title">A space for everyone to share, connect, and be heard.</h2>
@@ -83,7 +81,15 @@ const login = async () => {
     if (res.ok) {
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      router.push('/posts')
+      
+      // ✅ ADMIN CHECK — THIS IS THE ONLY PART I CHANGED!
+      const user = data.user
+      if (user?.isAdmin) {
+        router.push('/admin')    // 🛡️ Admin → Admin Dashboard!
+      } else {
+        router.push('/posts')    // 👤 Regular user → Regular Dashboard
+      }
+      
     } else {
       error.value = data.error || 'Invalid email or password'
     }

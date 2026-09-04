@@ -38,7 +38,7 @@
       </div>
     </aside>
 
-    <!-- 📱 ADMIN MOBILE BOTTOM NAVIGATION — ✅ NEW! -->
+    <!-- 📱 ADMIN MOBILE BOTTOM NAVIGATION → ✅ ADMIN-SPECIFIC MENU! -->
     <nav class="mobile-bottom-nav d-md-none">
       <router-link to="/posts" class="mobile-nav-item">
         <span class="mobile-nav-icon">🏠</span>
@@ -48,15 +48,24 @@
         <span class="mobile-nav-icon">👥</span>
         <span>Users</span>
       </router-link>
-      <router-link to="/create-post" class="mobile-nav-item create-btn">
-        <span class="plus-icon">+</span>
-      </router-link>
       <router-link to="/admin/posts" class="mobile-nav-item">
         <span class="mobile-nav-icon">📄</span>
         <span>Posts</span>
       </router-link>
+      <router-link to="/admin/hidden-posts" class="mobile-nav-item">
+        <span class="mobile-nav-icon">🙈</span>
+        <span>Hidden</span>
+      </router-link>
+      <router-link to="/admin/locked-comments" class="mobile-nav-item">
+        <span class="mobile-nav-icon">🔒</span>
+        <span>Locked</span>
+      </router-link>
+      <router-link to="/admin/hidden-users" class="mobile-nav-item">
+        <span class="mobile-nav-icon">🚫</span>
+        <span>Blocked</span>
+      </router-link>
       <button @click="logout" class="mobile-nav-item logout-btn">
-        <span class="mobile-nav-icon">🚪</span>
+        <span class="mobile-nav-icon">➡️</span>
         <span>Logout</span>
       </button>
     </nav>
