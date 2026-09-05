@@ -42,34 +42,38 @@
       </div>
     </aside>
 
-    <!-- 📱 ADMIN MOBILE BOTTOM NAVIGATION -->
+    <!-- 📱 ADMIN MOBILE BOTTOM NAVIGATION ✅ UNBLOCKABLE LOGOUT -->
     <nav class="mobile-bottom-nav d-md-none">
-      <router-link to="/admin" class="mobile-nav-item">
+      <router-link to="/posts" class="mobile-nav-item">
         <span class="mobile-nav-icon">🏠</span>
+        <span class="mobile-nav-label">Home</span>
       </router-link>
       <router-link to="/admin/users" class="mobile-nav-item">
         <span class="mobile-nav-icon">👥</span>
+        <span class="mobile-nav-label">Users</span>
       </router-link>
-      <!-- ✅ CREATE POST → goes to /create-post page -->
       <router-link to="/create-post" class="mobile-nav-item create-post-mobile">
         <span class="mobile-nav-icon">➕</span>
       </router-link>
-      <!-- ✅ ALL POSTS → NOW points to /admin/posts NOT /create-post! -->
       <router-link to="/admin/posts" class="mobile-nav-item">
         <span class="mobile-nav-icon">📄</span>
+        <span class="mobile-nav-label">Posts</span>
       </router-link>
-      <router-link to="/admin/hidden-posts" class="mobile-nav-item">
-        <span class="mobile-nav-icon">🙈</span>
-      </router-link>
-      <router-link to="/admin/locked-comments" class="mobile-nav-item">
-        <span class="mobile-nav-icon">🔒</span>
-      </router-link>
-      <router-link to="/admin/hidden-users" class="mobile-nav-item">
-        <span class="mobile-nav-icon">🚫</span>
-      </router-link>
-      <button @click="logout" class="mobile-nav-item logout-btn">
-        <span class="mobile-nav-icon">➡️</span>
-      </button>
+      <div class="mobile-nav-item more-menu-container" @click="showMoreMenu = !showMoreMenu">
+        <span class="mobile-nav-icon">⋯</span>
+        <span class="mobile-nav-label">More</span>
+        
+        <!-- ✅ ADMIN DROPDOWN — ALL MENUS + UNBLOCKABLE LOGOUT -->
+        <div v-if="showMoreMenu" class="more-dropdown-menu dropdown-up">
+          <router-link to="/admin/hidden-posts" class="dropdown-item" @click="showMoreMenu = false">🙈 Hidden Posts</router-link>
+          <router-link to="/admin/locked-comments" class="dropdown-item" @click="showMoreMenu = false">🔒 Locked Comments</router-link>
+          <router-link to="/admin/hidden-users" class="dropdown-item" @click="showMoreMenu = false">🚫 Blocked Users</router-link>
+          <router-link to="/profile" class="dropdown-item" @click="showMoreMenu = false">👤 Profile</router-link>
+          <a class="dropdown-item" @click="comingSoon; showMoreMenu = false">⚙️ Settings</a>
+          <!-- ✅ UNBLOCKABLE LOGOUT — NATIVE JAVASCRIPT -->
+          <a class="dropdown-item logout-item" onclick="handleAdminLogout(event)">➡️ Logout</a>
+        </div>
+      </div>
     </nav>
 
     <!-- 📄 MAIN CONTENT AREA -->
@@ -77,7 +81,6 @@
       <!-- 🏠 ADMIN HOME -->
       <div v-if="activeView === 'home'">
         <h1 class="feed-title">All Posts</h1>
-        <!-- ✅ Create Post Button — REMOVED from top-right since we have it in nav now -->
         <div v-if="loading" class="loading-text">Loading...</div>
         <div v-else-if="allPosts.length > 0">
           <div v-for="post in allPosts" :key="post._id" class="post-card">
@@ -373,6 +376,9 @@ const token = ref(localStorage.getItem('token') || '')
 const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
 const isAdmin = ref(!!currentUser?.isAdmin)
 
+// ✅ More menu dropdown toggle
+const showMoreMenu = ref(false)
+
 // ✅ Tab navigation
 const activeView = computed(() => {
   const path = route.path
@@ -450,13 +456,11 @@ const toggleLike = async (postId) => {
   if (!post) return
   const userId = currentUser._id
   const hasLiked = post.likes?.includes(userId)
-
   if (hasLiked) post.likes = post.likes.filter(id => id !== userId)
   else {
     if (!post.likes) post.likes = []
     post.likes.push(userId)
   }
-
   try {
     await fetch(`${API_URL}/posts/like/${postId}`, {
       method: 'PATCH',
@@ -481,7 +485,6 @@ const toggleCommentInput = (postId) => {
 const submitComment = async (postId) => {
   const text = commentText.value[postId]?.trim()
   if (!text) return
-
   const tempComment = {
     content: text,
     userId: currentUser._id,
@@ -489,16 +492,13 @@ const submitComment = async (postId) => {
     createdAt: new Date().toISOString(),
     isHidden: false
   }
-
   const post = allPosts.value.find(p => p._id === postId)
   if (post) {
     if (!post.comments) post.comments = []
     post.comments.push(tempComment)
   }
-
   commentText.value[postId] = ''
   showCommentInput.value[postId] = false
-
   try {
     await fetch(`${API_URL}/posts/comment/${postId}`, {
       method: 'PATCH',
@@ -518,7 +518,6 @@ const submitComment = async (postId) => {
 const toggleCommentVisibility = async (postId, commentIndex, currentHidden) => {
   const post = allPosts.value.find(p => p._id === postId)
   if (!post || !post.comments[commentIndex]) return
-
   post.comments[commentIndex].isHidden = !currentHidden
   try {
     await fetch(`${API_URL}/posts/toggle-comment-hidden/${postId}/${commentIndex}`, {
@@ -574,6 +573,7 @@ const toggleBlockUser = async (userId, currentState) => {
   alert('Block user route coming soon! 🚀')
 }
 
+// ✅ DESKTOP LOGOUT
 const logout = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('user')
@@ -582,6 +582,21 @@ const logout = () => {
 
 const comingSoon = () => {
   alert('This feature is coming soon! 🚀')
+}
+
+// ✅ UNBLOCKABLE MOBILE LOGOUT — NATIVE JAVASCRIPT
+if (typeof window !== 'undefined') {
+  window.handleAdminLogout = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Close dropdown
+    showMoreMenu.value = false;
+    // Clear storage
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    // Force redirect — nothing can block this!
+    window.location.href = '/login';
+  };
 }
 
 onMounted(() => {

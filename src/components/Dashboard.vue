@@ -24,7 +24,6 @@
            <span class="nav-icon">👤</span> Profile
          </router-link>
        </template>
-
        <!-- 🛡️ ADMIN MENU → CLEANED UP! NO DUPLICATE HOME! -->
        <template v-else>
          <!-- ✅ SAME "Home" link as regular users → FULL COMMENT/LIKE ABILITIES! -->
@@ -57,7 +56,6 @@
        </a>
      </div>
    </aside>
-
     <!-- 📄 RIGHT — Posts Feed -->
     <main class="dashboard-feed">
       <h1 class="feed-title">{{ isAdmin ? 'Admin Timeline' : 'Timeline' }}</h1>
@@ -169,33 +167,34 @@
         <p>No posts yet. Be the first to share something! ✨</p>
       </div>
     </main>
-    <!-- ======================================
-         📱 MOBILE BOTTOM NAVIGATION — ONLY ON SMALL SCREENS
-         ====================================== -->
+    <!-- 📱 REGULAR USER Mobile Bottom Nav -->
     <nav class="mobile-bottom-nav d-md-none">
-      <router-link to="/posts" class="mobile-nav-item" :class="{ active: currentView === 'home' }">
+      <router-link to="/posts" class="mobile-nav-item">
         <span class="mobile-nav-icon">🏠</span>
         <span class="mobile-nav-label">Home</span>
       </router-link>
-      <router-link to="/my-posts" class="mobile-nav-item" :class="{ active: currentView === 'myposts' }">
+      <router-link to="/my-posts" class="mobile-nav-item">
         <span class="mobile-nav-icon">📋</span>
         <span class="mobile-nav-label">My Posts</span>
       </router-link>
-      <router-link to="/create-post" class="mobile-nav-item create-btn">
-        <span class="mobile-nav-icon">+</span>
+      <router-link to="/create-post" class="mobile-nav-item create-post-mobile">
+        <span class="mobile-nav-icon">➕</span>
       </router-link>
-      <a class="mobile-nav-item" @click="comingSoon">
+      <router-link to="/notifications" class="mobile-nav-item">
         <span class="mobile-nav-icon">🔔</span>
         <span class="mobile-nav-label">Alerts</span>
-      </a>
-      <router-link to="/profile" class="mobile-nav-item" :class="{ active: currentView === 'profile' }">
-        <span class="mobile-nav-icon">👤</span>
-        <span class="mobile-nav-label">Profile</span>
       </router-link>
-      <button @click="logout" class="mobile-nav-item logout-btn">
-        <span class="mobile-nav-icon">➡️</span>
-        <span>Logout</span>
-      </button>
+      <div class="mobile-nav-item more-menu-container" @click="showMoreMenu = !showMoreMenu">
+        <span class="mobile-nav-icon">⋯</span>
+        <span class="mobile-nav-label">More</span>
+        
+        <!-- ✅ DROPDOWN → MUST BE INSIDE the more-menu-container div! -->
+        <div v-if="showMoreMenu" class="more-dropdown-menu dropdown-up" @click="showMoreMenu = false">
+          <router-link to="/profile" class="dropdown-item">👤 Profile</router-link>
+          <a class="dropdown-item" @click.stop="comingSoon">⚙️ Settings</a>
+          <a class="dropdown-item logout-item" @click.stop="logout">➡️ Logout</a>
+        </div>
+      </div>
     </nav>
   </div>
 </template>
@@ -209,6 +208,7 @@ const route = useRoute()
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
 const token = ref(localStorage.getItem('token') || '')
 const user = ref(JSON.parse(localStorage.getItem('user') || 'null'))
+const showMoreMenu = ref(false)
 
 // ✅ Auto-detect Admin!
 const isAdmin = computed(() => {
@@ -221,7 +221,7 @@ const openCommentId = ref(null)
 const newComment = ref('')
 const commentError = ref('')
 
-// ✅ UPDATED: "admin-home" → "home" so Home link highlights correctly!
+// ✅ Route highlighting
 const currentView = computed(() => {
   const path = route.path
   if (path === '/posts') return 'home'
@@ -238,7 +238,7 @@ const currentView = computed(() => {
   return 'home'
 })
 
-// ✅ BLOCK opening if locked!
+// ✅ Lock-aware comment form toggle
 const toggleCommentForm = (postId, isLocked) => {
   if (isLocked) {
     commentError.value = '🔒 Comments are locked by Admin'
@@ -254,12 +254,10 @@ const toggleCommentForm = (postId, isLocked) => {
   }
 }
 
-// ✅ Double-check lock BEFORE sending!
-// ✅ ADD COMMENT — NO SCROLL JUMP! Instantly adds comment locally!
+// ✅ Add comment — instant UI update, no page jump
 const addComment = async (postId) => {
   const post = posts.value.find(p => p._id === postId);
   
-  // ✅ Double-check lock BEFORE sending
   if (post?.isLocked) {
     commentError.value = '🔒 Comments are locked for this post.';
     return;
@@ -269,27 +267,25 @@ const addComment = async (postId) => {
     return;
   }
 
-  // ✅ Build NEW comment — show it INSTANTLY before server responds!
+  // ✅ Show comment INSTANTLY
   const tempComment = {
-    _id: 'temp-' + Date.now(), // fake ID temporarily
+    _id: 'temp-' + Date.now(),
     username: user.value?.username || 'You',
     content: newComment.value.trim(),
     createdAt: new Date().toISOString()
   };
 
-  // ✅ INSTANTLY add to UI — NO WAITING!
   if (post) {
     if (!post.comments) post.comments = [];
-    post.comments.push(tempComment); // ✅ Appears IMMEDIATELY!
+    post.comments.push(tempComment);
   }
 
-  // ✅ Clear form & close it
   const commentText = newComment.value;
   openCommentId.value = null;
   newComment.value = '';
   commentError.value = '';
 
-  // ✅ Send to server in BACKGROUND — NO reload!
+  // ✅ Send to server in background
   try {
     const res = await fetch(`${API_URL}/posts/comment/${postId}`, {
       method: 'PATCH',
@@ -300,25 +296,19 @@ const addComment = async (postId) => {
       body: JSON.stringify({ content: commentText })
     });
     const data = await res.json();
-    
-    if (!res.ok) {
-      throw new Error(data.error || 'Failed to add comment');
-    }
-    // ✅ Server saved it — NO NEED TO RELOAD!
-    
+    if (!res.ok) throw new Error(data.error || 'Failed to add comment');
   } catch (err) {
-    // ❌ If server fails — REMOVE the temp comment!
+    // ❌ Rollback on error
     if (post) {
       post.comments = post.comments.filter(c => c._id !== tempComment._id);
     }
     commentError.value = err.message || 'Server error. Please try again.';
-    // Optionally re-open form
     openCommentId.value = postId;
     newComment.value = commentText;
   }
 };
 
-// ✅ ADMIN: Toggle Lock Comments
+// ✅ Admin: Toggle Lock Comments
 const toggleLock = async (postId, currentState) => {
   try {
     const res = await fetch(`${API_URL}/posts/lock/${postId}`, {
@@ -328,17 +318,12 @@ const toggleLock = async (postId, currentState) => {
         'Content-Type': 'application/json'
       }
     })
-    if (res.ok) {
-      fetchPosts()
-    } else {
-      alert('Failed to toggle lock!')
-    }
-  } catch (err) {
-    alert('Server error!')
-  }
+    if (res.ok) fetchPosts()
+    else alert('Failed to toggle lock!')
+  } catch (err) { alert('Server error!') }
 }
 
-// ✅ ADMIN: Toggle Hide Post
+// ✅ Admin: Toggle Hide Post
 const toggleHide = async (postId, currentState) => {
   try {
     const res = await fetch(`${API_URL}/posts/hide/${postId}`, {
@@ -348,28 +333,21 @@ const toggleHide = async (postId, currentState) => {
         'Content-Type': 'application/json'
       }
     })
-    if (res.ok) {
-      fetchPosts()
-    } else {
-      alert('Failed to toggle visibility!')
-    }
-  } catch (err) {
-    alert('Server error!')
-  }
+    if (res.ok) fetchPosts()
+    else alert('Failed to toggle visibility!')
+  } catch (err) { alert('Server error!') }
 }
 
-// Handle broken image links
-const handleImageError = (e) => {
-  e.target.style.display = 'none'
-}
+// ✅ Handle broken images
+const handleImageError = (e) => { e.target.style.display = 'none' }
 
-// Get user initials for avatar
+// ✅ Get initials for avatars
 const getInitials = (name) => {
   if (!name) return 'U'
   return name.charAt(0).toUpperCase()
 }
 
-// Format timestamp
+// ✅ Format timestamp
 const formatTime = (dateStr) => {
   if (!dateStr) return ''
   const date = new Date(dateStr)
@@ -380,7 +358,7 @@ const formatTime = (dateStr) => {
   return `${Math.floor(hours / 24)}d ago`
 }
 
-// Fetch posts
+// ✅ Fetch posts
 const fetchPosts = async () => {
   loading.value = true
   try {
@@ -388,36 +366,26 @@ const fetchPosts = async () => {
       headers: { 'Authorization': `Bearer ${token.value}` }
     })
     const data = await res.json()
-    if (res.ok) {
-      posts.value = data.posts || data || []
-    }
-  } catch (err) {
-    console.error('Error fetching posts:', err)
-  }
+    if (res.ok) posts.value = data.posts || data || []
+  } catch (err) { console.error('Error fetching posts:', err) }
   loading.value = false
 }
 
-// Toggle like
-// ✅ LIKE — NO PAGE JUMP! Update locally instead of reloading everything!
+// ✅ Toggle Like — instant UI update
 const toggleLike = async (postId) => {
-  // 🔍 Find the post we clicked
   const postIndex = posts.value.findIndex(p => p._id === postId);
   if (postIndex === -1) return;
-
-  // ✅ OPTIMISTIC UPDATE: Change count IMMEDIATELY (no wait!)
+  
   const post = posts.value[postIndex];
-  const hadLiked = post.likes?.includes(user.value?._id); // Check if already liked
-
+  const hadLiked = post.likes?.includes(user.value?._id);
+  
   if (hadLiked) {
-    // ❌ Unlike — remove my ID, decrease count
     post.likes = post.likes.filter(id => id !== user.value?._id);
   } else {
-    // ❤️ Like — add my ID, increase count
     if (!post.likes) post.likes = [];
     post.likes.push(user.value?._id);
   }
 
-  // ✅ Send to server in BACKGROUND — NO loading/spinner
   try {
     await fetch(`${API_URL}/posts/like/${postId}`, {
       method: 'PATCH',
@@ -426,15 +394,13 @@ const toggleLike = async (postId) => {
         'Content-Type': 'application/json'
       }
     });
-    // ✅ Server confirmed — NO NEED TO REFRESH!
   } catch (err) {
-    // ❌ If server fails — REVERT the local change!
-    fetchPosts(); // Only full reload on error
+    fetchPosts();
     console.error('Like error:', err);
   }
 };
 
-// Logout
+// ✅ Logout
 const logout = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('user')
