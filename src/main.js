@@ -17,21 +17,23 @@ const routes = [
   { path: '/login', component: Login },
   
   // 👤 REGULAR USER routes → load Dashboard.vue
-  { path: '/posts', component: Dashboard },           // ✅ Regular user timeline
+  { path: '/posts', component: Dashboard },
   { path: '/my-posts', component: MyPosts },
   { path: '/create-post', component: CreatePost },
   { path: '/edit-post/:id', component: EditPost },
   { path: '/profile', component: Profile },
-
+  
   // 🛡️ ADMIN routes → load AdminDashboard.vue
-  { path: '/admin', component: AdminDashboard },              // ✅ NO REDIRECT!
+  { path: '/admin', component: AdminDashboard },
   { path: '/admin/users', component: AdminDashboard },
   { path: '/admin/posts', component: AdminDashboard },
   { path: '/admin/hidden-posts', component: AdminDashboard },
-  { path: '/admin/hidden-users', component: AdminDashboard },
   { path: '/admin/locked-comments', component: AdminDashboard },
+  { path: '/admin/hidden-users', component: AdminDashboard }, // ✅ KEPT ONCE!
 
-  { path: '/', redirect: '/posts' }
+  // 🏠 Redirects
+  { path: '/', redirect: '/posts' },
+  { path: '/:pathMatch(.*)*', redirect: '/posts' }
 ]
 
 const router = createRouter({

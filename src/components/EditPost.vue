@@ -143,13 +143,24 @@
       </router-link>
       <div class="mobile-nav-item more-menu-container" @click="showMoreMenu = !showMoreMenu">
         <span class="mobile-nav-icon">⋯</span>
-        <div v-if="showMoreMenu" class="more-dropdown-menu">
-          <router-link to="/admin/users" class="dropdown-item" @click="showMoreMenu = false">👥 All Users</router-link>
-          <router-link to="/admin/hidden-posts" class="dropdown-item" @click="showMoreMenu = false">🙈 Hidden Posts</router-link>
-          <router-link to="/admin/locked-comments" class="dropdown-item" @click="showMoreMenu = false">🔒 Locked Comments</router-link>
-          <router-link to="/admin/hidden-users" class="dropdown-item" @click="showMoreMenu = false">🚫 Blocked Users</router-link>
-          <a class="dropdown-item" @click="logout; showMoreMenu = false">➡️ Logout</a>
+        
+        <div v-if="showMoreMenu" class="more-dropdown-menu dropdown-up" @click="showMoreMenu = false">
+          <!-- 🛡️ ADMIN ONLY: All Posts -->
+          <router-link v-if="isAdmin && $route.path !== '/admin/posts'" to="/admin/posts" class="dropdown-item">📄 All Posts</router-link>
+          
+          <!-- ✅ EVERYONE: Profile -->
+          <router-link v-if="$route.path !== '/profile'" to="/profile" class="dropdown-item">👤 Profile</router-link>
+          
+          <!-- 🛡️ ADMIN ONLY: Hidden Posts, Locked Comments, Blocked Users -->
+          <router-link v-if="isAdmin" to="/admin/hidden-posts" class="dropdown-item">🙈 Hidden Posts</router-link>
+          <router-link v-if="isAdmin" to="/admin/locked-comments" class="dropdown-item">🔒 Locked Comments</router-link>
+          <router-link v-if="isAdmin" to="/admin/hidden-users" class="dropdown-item">🚫 Blocked Users</router-link>
+          
+          <hr class="dropdown-divider" />
+          <a class="dropdown-item" @click.stop="comingSoon">⚙️ Settings</a>
+          <a class="dropdown-item logout-item" @click.stop="logout">➡️ Logout</a>
         </div>
+
       </div>
     </nav>
 

@@ -17,9 +17,6 @@
           <router-link to="/create-post" class="nav-item" :class="{ active: currentView === 'create' }">
             <span class="nav-icon">➕</span> Create
           </router-link>
-          <a class="nav-item" @click="comingSoon">
-            <span class="nav-icon">🔔</span> Notifications
-          </a>
           <router-link to="/profile" class="nav-item" :class="{ active: currentView === 'profile' }">
             <span class="nav-icon">👤</span> Profile
           </router-link>
@@ -207,20 +204,24 @@
       <div class="mobile-nav-item more-menu-container" @click="showMoreMenu = !showMoreMenu">
         <span class="mobile-nav-icon">⋯</span>
         <span class="mobile-nav-label">More</span>
+
         <div v-if="showMoreMenu" class="more-dropdown-menu dropdown-up" @click="showMoreMenu = false">
-          <!-- ✅ Hide All Posts when already ON All Posts page -->
-          <router-link v-if="$route.path !== '/admin/posts'" to="/admin/posts" class="dropdown-item">📄 All Posts</router-link>
+          <!-- 🛡️ ADMIN ONLY: All Posts -->
+          <router-link v-if="isAdmin && $route.path !== '/admin/posts'" to="/admin/posts" class="dropdown-item">📄 All Posts</router-link>
           
-          <!-- ✅ Hide Profile when already ON Profile page -->
+          <!-- ✅ EVERYONE: Profile -->
           <router-link v-if="$route.path !== '/profile'" to="/profile" class="dropdown-item">👤 Profile</router-link>
           
-          <router-link to="/admin/hidden-posts" class="dropdown-item">🙈 Hidden Posts</router-link>
-          <router-link to="/admin/locked-comments" class="dropdown-item">🔒 Locked Comments</router-link>
-          <router-link to="/admin/hidden-users" class="dropdown-item">🚫 Blocked Users</router-link>
+          <!-- 🛡️ ADMIN ONLY: Hidden Posts, Locked Comments, Blocked Users -->
+          <router-link v-if="isAdmin" to="/admin/hidden-posts" class="dropdown-item">🙈 Hidden Posts</router-link>
+          <router-link v-if="isAdmin" to="/admin/locked-comments" class="dropdown-item">🔒 Locked Comments</router-link>
+          <router-link v-if="isAdmin" to="/admin/hidden-users" class="dropdown-item">🚫 Blocked Users</router-link>
+          
           <hr class="dropdown-divider" />
           <a class="dropdown-item" @click.stop="comingSoon">⚙️ Settings</a>
           <a class="dropdown-item logout-item" @click.stop="logout">➡️ Logout</a>
         </div>
+
       </div>
     </nav>
 
