@@ -2828,3 +2828,327 @@ textarea.post-textarea {
      width: 100% !important;
      box-sizing: border-box !important;
    }
+
+   /* ======================================
+      ✏️ EDIT & 🗑️ DELETE POST BUTTONS
+      ====================================== */
+   .post-owner-actions {
+     display: flex;
+     justify-content: flex-end;  /* ✅ PUSHES BUTTONS TO THE RIGHT */
+     align-items: center;
+     gap: 12px;
+     margin-top: 12px;
+     padding-top: 12px;
+     border-top: 1px solid #e6e6e6;
+   }
+
+   .edit-post-btn {
+     padding: 6px 18px;
+     background-color: #1d9bf0;
+     color: white;
+     border: none;
+     border-radius: 18px;
+     font-size: 14px;
+     font-weight: 500;
+     cursor: pointer;
+     text-decoration: none;
+     transition: background-color 0.2s ease;
+   }
+
+   .edit-post-btn:hover {
+     background-color: #1a8cd8;
+     color: white;
+   }
+
+   .delete-post-btn {
+     padding: 6px 18px;
+     background-color: #e21b46;
+     color: white;
+     border: none;
+     border-radius: 18px;
+     font-size: 14px;
+     font-weight: 500;
+     cursor: pointer;
+     transition: background-color 0.2s ease;
+   }
+
+   .delete-post-btn:hover {
+     background-color: #c41238;
+   }
+
+   /* ======================================
+      ✏️ CREATE POST — BUTTON STYLING (FIXED)
+      ====================================== */
+   .create-post-buttons {
+     display: flex !important;
+     justify-content: flex-end !important;
+     gap: 12px !important;
+     margin-top: 20px !important;
+     width: 100% !important;
+   }
+
+   .create-post-buttons .cancel-btn {
+     padding: 8px 28px !important;
+     background-color: #f0f0f0 !important;
+     color: #333 !important;
+     border: 1px solid #e6e6e6 !important;
+     border-radius: 20px !important;
+     font-size: 15px !important;
+     font-weight: 500 !important;
+     cursor: pointer !important;
+     transition: all 0.2s ease !important;
+     min-width: 100px !important;
+     width: auto !important;          /* ✅ THIS IS THE KEY — OVERRIDE FULL WIDTH */
+     flex: 0 0 auto !important;       /* ✅ DON'T LET IT GROW */
+   }
+
+   .create-post-buttons .cancel-btn:hover {
+     background-color: #e6e6e6 !important;
+   }
+
+   .create-post-buttons .post-btn {
+     padding: 8px 32px !important;
+     background-color: #1d9bf0 !important;
+     color: white !important;
+     border: none !important;
+     border-radius: 20px !important;
+     font-size: 15px !important;
+     font-weight: 500 !important;
+     cursor: pointer !important;
+     transition: background-color 0.2s ease !important;
+     width: auto !important;
+     flex: 0 0 auto !important;
+   }
+
+   .create-post-buttons .post-btn:hover {
+     background-color: #1a8cd8 !important;
+   }
+
+   /* ======================================
+   ✏️ EDIT POST — CHARACTER COUNT POSITION
+   ====================================== */
+.form-footer {
+  display: flex !important;
+  justify-content: space-between !important; /* ✅ Pushes count LEFT, buttons RIGHT */
+  align-items: center !important;
+  width: 100% !important;
+  margin-top: 16px !important;
+}
+
+.form-footer .char-count {
+  order: 1 !important; /* ✅ Character count on LEFT */
+  margin: 0 !important;
+}
+
+.form-footer .button-group {
+  order: 2 !important; /* ✅ Buttons on RIGHT */
+  display: flex !important;
+  gap: 12px !important;
+}
+
+/* ======================================
+   🖼️ IMAGE PREVIEW — CREATE & EDIT POST
+   ====================================== */
+.image-preview-container {
+  margin-top: 14px;
+  padding: 14px;
+  background-color: #f7f9fa;
+  border-radius: 12px;
+  border: 1px solid #e6e6e6;
+}
+
+.preview-label {
+  font-size: 14px;
+  color: #536471;
+  margin: 0 0 10px 0;
+  font-weight: 500;
+}
+
+.image-preview {
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 8px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.remove-image-btn {
+  margin-top: 12px;
+  padding: 7px 16px;
+  background-color: #e21b46;
+  color: white;
+  border: none;
+  border-radius: 18px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.remove-image-btn:hover {
+  background-color: #c41238;
+}
+
+/* ======================================
+   💬 COMMENT BUTTONS — EXACT MATCH!
+   ====================================== */
+.comment-buttons {
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 12px !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin-top: 10px !important;
+}
+
+.comment-buttons .cancel-btn {
+  padding: 8px 28px !important;
+  background-color: #f0f0f0 !important;
+  color: #333 !important;
+  border: 1px solid #e6e6e6 !important;
+  border-radius: 20px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  min-width: 100px !important;
+  width: auto !important;          /* ✅ NOT full width! */
+  height: 40px !important;          /* ✅ SAME HEIGHT */
+  flex: 0 0 auto !important;        /* ✅ Don't stretch! */
+}
+
+.comment-buttons .cancel-btn:hover {
+  background-color: #e6e6e6 !important;
+}
+
+.comment-buttons .submit-btn {
+  padding: 8px 24px !important;
+  background-color: #1d9bf0 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 20px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease !important;
+  height: 40px !important;          /* ✅ MATCHES CANCEL HEIGHT */
+}
+
+.comment-buttons .submit-btn:hover {
+  background-color: #1a8cd8 !important;
+}
+
+/* ======================================
+   📱 MOBILE BOTTOM NAV — PROFILE PAGE FIX
+   ====================================== */
+/* Hide Profile icon when ON Profile page */
+.router-link-active[to="/profile"] {
+  display: none !important;
+}
+
+/* Better More button styling */
+.more-menu-container,
+.mobile-nav-item:has(.more-dropdown-menu) {
+  position: relative !important;
+}
+
+/* More dropdown — clean positioning */
+.more-dropdown-menu {
+  position: absolute !important;
+  bottom: 65px !important;
+  right: 8px !important;
+  left: auto !important;
+  transform: none !important;
+  background: #ffffff !important;
+  border: 1px solid #e6e6e6 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  padding: 8px 0 !important;
+  min-width: 160px !important;
+  z-index: 9999 !important;
+}
+
+/* Dropdown items — clean look */
+.more-dropdown-menu .dropdown-item {
+  padding: 10px 16px !important;
+  font-size: 14px !important;
+  color: #0f1419 !important;
+  text-decoration: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.more-dropdown-menu .dropdown-item:hover {
+  background-color: #f7f9fa !important;
+}
+
+/* Bottom nav — ensure consistent spacing */
+.mobile-bottom-nav {
+  justify-content: space-around !important;
+}
+
+/* Active page highlight — make it clear */
+.mobile-nav-item.router-link-active,
+.mobile-nav-item:has(> .router-link-active) {
+  color: #1d9bf0 !important;
+  font-weight: 600 !important;
+}
+
+/* ======================================
+   📱 MOBILE MORE DROPDOWN — LOCKED POSITION
+   ====================================== */
+.more-menu-container {
+  position: relative !important;
+}
+
+.more-dropdown-menu {
+  position: absolute !important;
+  bottom: 65px !important;
+  right: 0 !important;       /* ✅ LOCK to container's RIGHT edge */
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  min-width: 180px !important;
+  max-width: 200px !important;
+  background: #ffffff !important;
+  border: 1px solid #e6e6e6 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
+  padding: 8px 0 !important;
+  z-index: 99999 !important;
+}
+
+/* Dropdown items */
+.more-dropdown-menu .dropdown-item {
+  padding: 12px 16px !important;
+  font-size: 14px !important;
+  color: #0f1419 !important;
+  text-decoration: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.more-dropdown-menu .dropdown-item:hover {
+  background-color: #f7f9fa !important;
+}
+
+.dropdown-divider {
+  border: none;
+  border-top: 1px solid #eff3f4;
+  margin: 6px 0;
+}
+
+/* ✅ Kill ANY conflicting positioning */
+.more-dropdown-menu[style*="left"],
+.more-dropdown-menu[style*="transform"],
+.more-dropdown-menu.dropdown-up {
+  left: auto !important;
+  transform: none !important;
+  right: 0 !important;
+}

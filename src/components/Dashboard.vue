@@ -25,11 +25,12 @@
           </router-link>
         </template>
 
-        <!-- 🛡️ ADMIN MENU → SAME Home link → full comment/like abilities! -->
+        <!-- 🛡️ ADMIN MENU → FULL MENU with Create Post + Profile! -->
         <template v-else>
           <router-link to="/posts" class="nav-item" :class="{ active: currentView === 'home' }">
             <span class="nav-icon">🏠</span> Home
           </router-link>
+          <!-- ✅ ADMIN EXTRA MENUS -->
           <router-link to="/admin/users" class="nav-item" :class="{ active: currentView === 'users' }">
             <span class="nav-icon">👥</span> All Users
           </router-link>
@@ -44,6 +45,13 @@
           </router-link>
           <router-link to="/admin/hidden-users" class="nav-item" :class="{ active: currentView === 'blocked' }">
             <span class="nav-icon">🚫</span> Blocked Users
+          </router-link>
+          <!-- ✅ THESE WERE MISSING! Added Create Post + Profile -->
+          <router-link to="/create-post" class="nav-item" :class="{ active: currentView === 'create' }">
+            <span class="nav-icon">➕</span> Create Post
+          </router-link>
+          <router-link to="/profile" class="nav-item" :class="{ active: currentView === 'profile' }">
+            <span class="nav-icon">👤</span> Profile
           </router-link>
         </template>
       </nav>
@@ -108,7 +116,6 @@
               </button>
             </div>
           </div>
-
           <!-- Comment Input Area -->
           <div v-if="openCommentId === post._id" class="comment-input-area">
             <textarea
@@ -124,7 +131,6 @@
               <button class="submit-btn" @click="addComment(post._id)">Post Comment</button>
             </div>
           </div>
-
           <!-- Comments List -->
           <div v-if="post.comments?.length > 0" class="comments-section">
             <div 
@@ -157,33 +163,67 @@
     </main>
 
     <!-- 📱 MOBILE BOTTOM NAVIGATION -->
+    <!-- 📱 MOBILE BOTTOM NAV — DYNAMIC: Changes on Profile page! -->
     <nav class="mobile-bottom-nav d-md-none">
-      <router-link to="/posts" class="mobile-nav-item">
+      <!-- ✅ ALWAYS SHOW: Home -->
+      <router-link to="/posts" class="mobile-nav-item" :class="{ active: $route.path === '/posts' }">
         <span class="mobile-nav-icon">🏠</span>
         <span class="mobile-nav-label">Home</span>
       </router-link>
-      <router-link to="/my-posts" class="mobile-nav-item">
-        <span class="mobile-nav-icon">📋</span>
-        <span class="mobile-nav-label">My Posts</span>
-      </router-link>
+
+      <!-- ✅ ALWAYS SHOW: Create Post -->
       <router-link to="/create-post" class="mobile-nav-item create-post-mobile">
         <span class="mobile-nav-icon">➕</span>
       </router-link>
-      <router-link to="/notifications" class="mobile-nav-item">
-        <span class="mobile-nav-icon">🔔</span>
-        <span class="mobile-nav-label">Alerts</span>
+
+      <!-- ✅ USERS — Always visible -->
+      <router-link to="/admin/users" class="mobile-nav-item" :class="{ active: $route.path === '/admin/users' }">
+        <span class="mobile-nav-icon">👥</span>
+        <span class="mobile-nav-label">Users</span>
       </router-link>
+
+      <!-- ✅ DYNAMIC: On Profile page → Show All Posts; Else → Show Profile -->
+      <router-link 
+        v-if="$route.path !== '/profile'" 
+        to="/profile" 
+        class="mobile-nav-item"
+        :class="{ active: $route.path === '/profile' }"
+      >
+        <span class="mobile-nav-icon">👤</span>
+        <span class="mobile-nav-label">Profile</span>
+      </router-link>
+
+      <router-link 
+        v-else 
+        to="/admin/posts" 
+        class="mobile-nav-item"
+        :class="{ active: $route.path === '/admin/posts' }"
+      >
+        <span class="mobile-nav-icon">📄</span>
+        <span class="mobile-nav-label">All Posts</span>
+      </router-link>
+
+      <!-- ✅ MORE MENU — Profile moves INSIDE when on Profile page! -->
       <div class="mobile-nav-item more-menu-container" @click="showMoreMenu = !showMoreMenu">
         <span class="mobile-nav-icon">⋯</span>
         <span class="mobile-nav-label">More</span>
-        
         <div v-if="showMoreMenu" class="more-dropdown-menu dropdown-up" @click="showMoreMenu = false">
-          <router-link to="/profile" class="dropdown-item">👤 Profile</router-link>
+          <!-- ✅ Hide All Posts when already ON All Posts page -->
+          <router-link v-if="$route.path !== '/admin/posts'" to="/admin/posts" class="dropdown-item">📄 All Posts</router-link>
+          
+          <!-- ✅ Hide Profile when already ON Profile page -->
+          <router-link v-if="$route.path !== '/profile'" to="/profile" class="dropdown-item">👤 Profile</router-link>
+          
+          <router-link to="/admin/hidden-posts" class="dropdown-item">🙈 Hidden Posts</router-link>
+          <router-link to="/admin/locked-comments" class="dropdown-item">🔒 Locked Comments</router-link>
+          <router-link to="/admin/hidden-users" class="dropdown-item">🚫 Blocked Users</router-link>
+          <hr class="dropdown-divider" />
           <a class="dropdown-item" @click.stop="comingSoon">⚙️ Settings</a>
           <a class="dropdown-item logout-item" @click.stop="logout">➡️ Logout</a>
         </div>
       </div>
     </nav>
+
   </div>
 </template>
 
@@ -202,7 +242,7 @@ const showMoreMenu = ref(false)
 // ✅ Auto-detect Admin!
 const isAdmin = computed(() => user.value?.isAdmin === true)
 
-// ✅ Route highlighting
+// ✅ Route highlighting — now includes Create + Profile for Admin!
 const currentView = computed(() => {
   const path = route.path
   if (path === '/posts') return 'home'

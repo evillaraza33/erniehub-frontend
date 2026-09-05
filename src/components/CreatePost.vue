@@ -40,7 +40,6 @@
         </a>
       </div>
     </aside>
-
     <!-- 💻 REGULAR USER Sidebar -->
     <aside v-else class="dashboard-sidebar d-none d-md-flex">
       <router-link to="/posts" class="sidebar-logo">
@@ -72,7 +71,6 @@
         </a>
       </div>
     </aside>
-
     <!-- 📱 ADMIN Mobile Bottom Nav -->
     <nav v-if="isAdmin" class="mobile-bottom-nav d-md-none">
       <router-link to="/admin" class="mobile-nav-item">
@@ -100,7 +98,6 @@
         <span class="mobile-nav-icon">➡️</span>
       </button>
     </nav>
-
     <!-- 📱 REGULAR USER Mobile Bottom Nav -->
     <nav v-else class="mobile-bottom-nav d-md-none">
       <router-link to="/posts" class="mobile-nav-item">
@@ -119,7 +116,6 @@
         <span class="mobile-nav-icon">👤</span>
       </router-link>
     </nav>
-
     <!-- ✅ MAIN CREATE POST FORM -->
     <main class="dashboard-feed create-post-feed">
       <div class="create-post-container">
@@ -140,6 +136,13 @@
           class="image-url-input"
           placeholder="Paste image URL here (optional)"
         />
+
+        <!-- 🖼️ LIVE IMAGE PREVIEW — NEW! -->
+        <div v-if="imageUrl" class="image-preview-container">
+          <p class="preview-label">🖼️ Image Preview:</p>
+          <img :src="imageUrl" alt="Preview" class="image-preview" @error="imageError = true" />
+          <button type="button" class="remove-image-btn" @click="imageUrl = ''">✕ Remove Image</button>
+        </div>
         
         <div class="create-post-buttons">
           <button class="cancel-btn" @click="goBack">Cancel</button>
@@ -151,7 +154,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import logo from '/src/assets/logo.png'
 
@@ -163,10 +166,10 @@ const isAdmin = ref(!!currentUser?.isAdmin)
 
 const postContent = ref('')
 const imageUrl = ref('')
+const imageError = ref(false) // ✅ NEW: handles broken image links
 
 const goBack = () => {
-  if (isAdmin.value) router.push('/admin')
-  else router.push('/posts')
+  router.back() // ✅ Goes to PREVIOUS page in browser history!
 }
 
 const submitPost = async () => {
@@ -175,7 +178,6 @@ const submitPost = async () => {
     alert('Please fill out this field.')
     return
   }
-
   try {
     const res = await fetch(`${API_URL}/posts/create`, {
       method: 'POST',
@@ -188,7 +190,6 @@ const submitPost = async () => {
         imageUrl: imageUrl.value || null
       })
     })
-
     const data = await res.json()
     if (res.ok) {
       alert('Post created successfully! 🎉')

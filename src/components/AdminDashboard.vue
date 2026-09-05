@@ -62,16 +62,20 @@
       <div class="mobile-nav-item more-menu-container" @click="showMoreMenu = !showMoreMenu">
         <span class="mobile-nav-icon">⋯</span>
         <span class="mobile-nav-label">More</span>
-        
         <!-- ✅ ADMIN DROPDOWN — ALL MENUS + UNBLOCKABLE LOGOUT -->
-        <div v-if="showMoreMenu" class="more-dropdown-menu dropdown-up">
-          <router-link to="/admin/hidden-posts" class="dropdown-item" @click="showMoreMenu = false">🙈 Hidden Posts</router-link>
-          <router-link to="/admin/locked-comments" class="dropdown-item" @click="showMoreMenu = false">🔒 Locked Comments</router-link>
-          <router-link to="/admin/hidden-users" class="dropdown-item" @click="showMoreMenu = false">🚫 Blocked Users</router-link>
-          <router-link to="/profile" class="dropdown-item" @click="showMoreMenu = false">👤 Profile</router-link>
-          <a class="dropdown-item" @click="comingSoon; showMoreMenu = false">⚙️ Settings</a>
-          <!-- ✅ UNBLOCKABLE LOGOUT — NATIVE JAVASCRIPT -->
-          <a class="dropdown-item logout-item" onclick="handleAdminLogout(event)">➡️ Logout</a>
+        <div v-if="showMoreMenu" class="more-dropdown-menu dropdown-up" @click="showMoreMenu = false">
+          <!-- ✅ Hide All Posts when already ON All Posts page -->
+          <router-link v-if="$route.path !== '/admin/posts'" to="/admin/posts" class="dropdown-item">📄 All Posts</router-link>
+          
+          <!-- ✅ Hide Profile when already ON Profile page -->
+          <router-link v-if="$route.path !== '/profile'" to="/profile" class="dropdown-item">👤 Profile</router-link>
+          
+          <router-link to="/admin/hidden-posts" class="dropdown-item">🙈 Hidden Posts</router-link>
+          <router-link to="/admin/locked-comments" class="dropdown-item">🔒 Locked Comments</router-link>
+          <router-link to="/admin/hidden-users" class="dropdown-item">🚫 Blocked Users</router-link>
+          <hr class="dropdown-divider" />
+          <a class="dropdown-item" @click.stop="comingSoon">⚙️ Settings</a>
+          <a class="dropdown-item logout-item" @click.stop="logout">➡️ Logout</a>
         </div>
       </div>
     </nav>

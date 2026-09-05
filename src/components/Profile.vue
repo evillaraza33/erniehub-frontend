@@ -2,12 +2,15 @@
   <div class="dashboard-container">
     <!-- 💻 ADMIN Sidebar -->
     <aside v-if="isAdmin" class="dashboard-sidebar d-none d-md-flex admin-sidebar">
-      <router-link to="/admin" class="sidebar-logo">
+      <router-link to="/posts" class="sidebar-logo">
         <img :src="logo" alt="ErnieHub" />
       </router-link>
       <nav class="sidebar-nav">
-        <router-link to="/admin" class="nav-item">
+        <router-link to="/posts" class="nav-item">
           <span class="nav-icon">🏠</span> Home
+        </router-link>
+        <router-link to="/create-post" class="nav-item">
+          <span class="nav-icon">➕</span> Create Post
         </router-link>
         <router-link to="/admin/users" class="nav-item">
           <span class="nav-icon">👥</span> All Users
@@ -70,36 +73,54 @@
       </div>
     </aside>
 
+    <!-- ✅ FIXED: Added v-if="isAdmin" so v-else works! -->
     <!-- 📱 ADMIN Mobile Bottom Nav -->
     <nav v-if="isAdmin" class="mobile-bottom-nav d-md-none">
-      <router-link to="/admin" class="mobile-nav-item">
+      <router-link to="/posts" class="mobile-nav-item" :class="{ active: $route.path === '/posts' }">
         <span class="mobile-nav-icon">🏠</span>
         <span class="mobile-nav-label">Home</span>
-      </router-link>
-      <router-link to="/admin/posts" class="mobile-nav-item">
-        <span class="mobile-nav-icon">📄</span>
-        <span class="mobile-nav-label">Posts</span>
       </router-link>
       <router-link to="/create-post" class="mobile-nav-item create-post-mobile">
         <span class="mobile-nav-icon">➕</span>
       </router-link>
-      <router-link to="/profile" class="mobile-nav-item active">
+      <router-link to="/admin/users" class="mobile-nav-item" :class="{ active: $route.path === '/admin/users' }">
+        <span class="mobile-nav-icon">👥</span>
+        <span class="mobile-nav-label">Users</span>
+      </router-link>
+      <router-link 
+        v-if="$route.path !== '/profile'" 
+        to="/profile" 
+        class="mobile-nav-item"
+        :class="{ active: $route.path === '/profile' }"
+      >
         <span class="mobile-nav-icon">👤</span>
         <span class="mobile-nav-label">Profile</span>
       </router-link>
-      <a class="mobile-nav-item" @click="logout">
-        <span class="mobile-nav-icon">➡️</span>
-        <span class="mobile-nav-label">Logout</span>
-      </a>
+      <router-link 
+        v-else 
+        to="/admin/posts" 
+        class="mobile-nav-item"
+        :class="{ active: $route.path === '/admin/posts' }"
+      >
+        <span class="mobile-nav-icon">📄</span>
+        <span class="mobile-nav-label">All Posts</span>
+      </router-link>
       <div class="mobile-nav-item more-menu-container" @click="showMoreMenu = !showMoreMenu">
         <span class="mobile-nav-icon">⋯</span>
         <span class="mobile-nav-label">More</span>
-        <div v-if="showMoreMenu" class="more-dropdown-menu">
-          <router-link to="/admin/users" class="dropdown-item" @click="showMoreMenu = false">👥 All Users</router-link>
-          <router-link to="/admin/hidden-posts" class="dropdown-item" @click="showMoreMenu = false">🙈 Hidden Posts</router-link>
-          <router-link to="/admin/locked-comments" class="dropdown-item" @click="showMoreMenu = false">🔒 Locked Comments</router-link>
-          <router-link to="/admin/hidden-users" class="dropdown-item" @click="showMoreMenu = false">🚫 Blocked Users</router-link>
-          <a class="dropdown-item" @click="comingSoon; showMoreMenu = false">⚙️ Settings</a>
+        <div v-if="showMoreMenu" class="more-dropdown-menu dropdown-up" @click="showMoreMenu = false">
+          <!-- ✅ Only show All Posts when NOT on Profile page -->
+          <router-link v-if="$route.path !== '/profile'" to="/admin/posts" class="dropdown-item">📄 All Posts</router-link>
+          
+          <!-- ✅ HIDE Profile when ALREADY ON Profile page -->
+          <router-link v-if="$route.path !== '/profile'" to="/profile" class="dropdown-item">👤 Profile</router-link>
+          
+          <router-link to="/admin/hidden-posts" class="dropdown-item">🙈 Hidden Posts</router-link>
+          <router-link to="/admin/locked-comments" class="dropdown-item">🔒 Locked Comments</router-link>
+          <router-link to="/admin/hidden-users" class="dropdown-item">🚫 Blocked Users</router-link>
+          <hr class="dropdown-divider" />
+          <a class="dropdown-item" @click.stop="comingSoon">⚙️ Settings</a>
+          <a class="dropdown-item logout-item" @click.stop="logout">➡️ Logout</a>
         </div>
       </div>
     </nav>
@@ -130,7 +151,6 @@
     <!-- ✅ PROFILE CONTENT -->
     <main class="dashboard-feed">
       <div class="profile-page-wrapper">
-        <!-- ✅ BIG BLUE AVATAR + NAME + EMAIL CENTERED -->
         <div class="profile-header-section">
           <div class="profile-avatar-large">
             {{ currentUser?.username?.charAt(0).toUpperCase() || 'U' }}
@@ -139,8 +159,6 @@
           <p class="profile-handle">@{{ currentUser?.username?.toLowerCase() }}</p>
           <p class="profile-email">{{ currentUser?.email }}</p>
         </div>
-
-        <!-- ✅ STATS -->
         <div class="profile-stats-row">
           <div class="profile-stat">
             <span class="stat-number">{{ myPostsCount }}</span>
@@ -155,15 +173,11 @@
             <span class="stat-label">Followers</span>
           </div>
         </div>
-
-        <!-- ✅ EDIT PROFILE BUTTON -->
         <div class="edit-button-wrapper">
           <button class="edit-profile-btn" @click="showEditForm = !showEditForm">
             ✏️ Edit Profile
           </button>
         </div>
-
-        <!-- ✅ EDIT FORM -->
         <div v-if="showEditForm" class="edit-form-container">
           <form @submit.prevent="updateProfile">
             <div class="form-group">
@@ -180,12 +194,12 @@
             </div>
             <div class="form-button-group">
               <button type="button" class="cancel-btn" @click="showEditForm = false">Cancel</button>
-              <button type="submit" class="save-btn">Save Changes</button>
+              <button type="submit" class="save-btn" :disabled="isSaving">
+                {{ isSaving ? 'Saving...' : 'Save Changes' }}
+              </button>
             </div>
           </form>
         </div>
-
-        <!-- ✅ TABS -->
         <div class="profile-tabs">
           <button 
             class="tab-btn" 
@@ -209,17 +223,12 @@
             ❤️ <span>Liked</span>
           </button>
         </div>
-
-        <!-- ✅ TAB CONTENT -->
         <div class="tab-content-area">
-          
-          <!-- 📄 MY POSTS TAB -->
           <div v-if="activeTab === 'posts'">
             <div v-if="isLoading" class="empty-state-container">
               <div class="empty-icon">⏳</div>
               <h3>Loading your posts...</h3>
             </div>
-            
             <div v-else-if="myPostsCount > 0" class="liked-posts-list">
               <div v-for="post in myPosts" :key="post._id" class="liked-post-card">
                 <p class="liked-post-content">{{ post.content }}</p>
@@ -230,9 +239,12 @@
                   <span>📝 Your post</span>
                   <span>{{ new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) }}</span>
                 </div>
+                <div class="post-owner-actions">
+                  <router-link :to="`/edit-post/${post._id}`" class="edit-post-btn">✏️ Edit</router-link>
+                  <button class="delete-post-btn" @click="deletePost(post._id)">🗑️ Delete</button>
+                </div>
               </div>
             </div>
-
             <div v-else class="empty-state-container">
               <div class="empty-icon">📝</div>
               <h3>No posts yet</h3>
@@ -242,21 +254,16 @@
               </router-link>
             </div>
           </div>
-
-          <!-- 📁 SAVED TAB -->
           <div v-if="activeTab === 'saved'" class="empty-state-container">
             <div class="empty-icon">📁</div>
             <h3>Saved Posts</h3>
             <p>Saved posts will appear here. Coming soon!</p>
           </div>
-
-          <!-- ❤️ LIKED TAB -->
           <div v-if="activeTab === 'liked'">
             <div v-if="isLoading" class="empty-state-container">
               <div class="empty-icon">⏳</div>
               <h3>Loading...</h3>
             </div>
-            
             <div v-else-if="likedPosts.length > 0" class="liked-posts-list">
               <div v-for="post in likedPosts" :key="post._id" class="liked-post-card">
                 <p class="liked-post-content">{{ post.content }}</p>
@@ -269,21 +276,17 @@
                 </div>
               </div>
             </div>
-
             <div v-else class="empty-state-container">
               <div class="empty-icon">❤️</div>
               <h3>No liked posts yet</h3>
               <p>When you like a post, it will appear here. Start exploring and show some love!</p>
             </div>
           </div>
-
         </div>
       </div>
     </main>
   </div>
 </template>
-
-<!-- ... keep your entire template the SAME ... -->
 
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -300,23 +303,20 @@ const myPosts = ref([])
 const myPostsCount = ref(0)
 const likedPosts = ref([])
 const isLoading = ref(false)
-const isSaving = ref(false) // ✅ For save button loading state
-
+const isSaving = ref(false)
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
 const token = localStorage.getItem('token')
 const userId = currentUser.value?._id
 const username = currentUser.value?.username
 
-console.log('👤 CURRENT USER:', { _id: userId, username })
+console.log('👤 CURRENT USER:', { _id: userId, username, isAdmin: isAdmin.value })
 
-// ✅ SWITCH TAB
 const switchTab = async (tabName) => {
   activeTab.value = tabName
   if (tabName === 'posts') await fetchMyPosts()
   if (tabName === 'liked') await fetchLikedPosts()
 }
 
-// ✅ FETCH MY POSTS
 const fetchMyPosts = async () => {
   if (!token) return
   isLoading.value = true
@@ -335,14 +335,11 @@ const fetchMyPosts = async () => {
     console.log('📦 TOTAL POSTS LOADED:', allPosts.length)
     
     if (allPosts.length > 0) {
-      console.log('🔍 FIRST POST SAMPLE:', JSON.stringify(allPosts[0], null, 2))
-      
       myPosts.value = allPosts.filter(post => {
         const matchesById = post.userId === userId || post.user === userId
         const matchesByName = post.username === username
         return matchesById || matchesByName
       })
-      
       myPostsCount.value = myPosts.value.length
       console.log('✅ YOUR POSTS:', myPostsCount.value)
     }
@@ -353,7 +350,31 @@ const fetchMyPosts = async () => {
   }
 }
 
-// ✅ FETCH LIKED POSTS
+const deletePost = async (postId) => {
+  if (!confirm('⚠️ Are you sure you want to delete this post? This cannot be undone!')) return
+  
+  try {
+    const res = await fetch(`${API_URL}/posts/delete/${postId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    
+    if (res.ok) {
+      alert('✅ Post deleted successfully!')
+      await fetchMyPosts()
+    } else {
+      const data = await res.json()
+      alert('❌ ' + (data.error || 'Failed to delete post'))
+    }
+  } catch (err) {
+    console.log('❌ Delete error:', err)
+    alert('❌ Server error. Please try again.')
+  }
+}
+
 const fetchLikedPosts = async () => {
   if (!token) return
   isLoading.value = true
@@ -370,18 +391,10 @@ const fetchLikedPosts = async () => {
     else if (data.message && Array.isArray(data.message)) allPosts = data.message
     
     if (allPosts.length > 0) {
-      console.log('🔍 LIKES FIELD SAMPLE:', allPosts[0].likes)
-      
       likedPosts.value = allPosts.filter(post => {
-        if (!post.likes) return false
-        if (!Array.isArray(post.likes)) return false
-        
-        const likesById = post.likes.includes(userId)
-        const likesByName = post.likes.includes(username)
-        return likesById || likesByName
+        if (!post.likes || !Array.isArray(post.likes)) return false
+        return post.likes.includes(userId)
       })
-      
-      console.log('✅ LIKED POSTS:', likedPosts.value.length)
     }
   } catch (err) {
     console.log('❌ ERROR:', err)
@@ -390,20 +403,17 @@ const fetchLikedPosts = async () => {
   }
 }
 
-// ✅ FORM DATA
 const updateForm = ref({
   username: '',
   email: '',
   password: ''
 })
 
-// ✅ SAVE CHANGES — ACTUALLY SENDS TO BACKEND!
 const updateProfile = async () => {
   if (!token) return alert('Please log in first')
   
   isSaving.value = true
   try {
-    // ✅ Build payload — only send fields that were changed
     const payload = {}
     if (updateForm.value.username && updateForm.value.username !== currentUser.value.username) {
       payload.username = updateForm.value.username
@@ -415,15 +425,11 @@ const updateProfile = async () => {
       payload.password = updateForm.value.password
     }
     
-    // ✅ If nothing changed
     if (Object.keys(payload).length === 0) {
       alert('No changes were made!')
       return
     }
     
-    console.log('📤 Sending update:', payload)
-    
-    // ✅ Send to backend
     const res = await fetch(`${API_URL}/users/update`, {
       method: 'PATCH',
       headers: {
@@ -436,21 +442,17 @@ const updateProfile = async () => {
     const result = await res.json()
     
     if (res.ok) {
-      // ✅ Update local storage so header shows new name instantly!
       const updatedUser = { ...currentUser.value, ...result.user }
       localStorage.setItem('user', JSON.stringify(updatedUser))
       currentUser.value = updatedUser
       
       alert('✅ Profile updated successfully!')
       showEditForm.value = false
-      
-      // ✅ Clear password field
       updateForm.value.password = ''
     } else {
       alert('❌ Error: ' + (result.error || 'Could not update profile'))
     }
   } catch (err) {
-    console.log('❌ Save error:', err)
     alert('❌ Something went wrong. Please try again.')
   } finally {
     isSaving.value = false
@@ -464,7 +466,7 @@ const logout = () => {
 }
 
 const comingSoon = () => {
-  alert('Coming soon!')
+  alert('Coming soon! 🚀')
 }
 
 onMounted(() => {
