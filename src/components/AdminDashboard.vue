@@ -27,6 +27,10 @@
         <router-link to="/profile" class="nav-item" :class="{ active: activeView === 'profile' }">
           <span class="nav-icon">👤</span> Profile
         </router-link>
+        <!-- ✅ CREATE POST — DESKTOP SIDEBAR -->
+        <router-link to="/create-post" class="nav-item create-post-sidebar">
+          <span class="nav-icon">➕</span> Create Post
+        </router-link>
       </nav>
       <div class="sidebar-bottom">
         <a class="nav-item" @click="comingSoon">
@@ -42,31 +46,29 @@
     <nav class="mobile-bottom-nav d-md-none">
       <router-link to="/admin" class="mobile-nav-item">
         <span class="mobile-nav-icon">🏠</span>
-        <span>Home</span>
       </router-link>
       <router-link to="/admin/users" class="mobile-nav-item">
         <span class="mobile-nav-icon">👥</span>
-        <span>Users</span>
       </router-link>
+      <!-- ✅ CREATE POST → goes to /create-post page -->
+      <router-link to="/create-post" class="mobile-nav-item create-post-mobile">
+        <span class="mobile-nav-icon">➕</span>
+      </router-link>
+      <!-- ✅ ALL POSTS → NOW points to /admin/posts NOT /create-post! -->
       <router-link to="/admin/posts" class="mobile-nav-item">
         <span class="mobile-nav-icon">📄</span>
-        <span>Posts</span>
       </router-link>
       <router-link to="/admin/hidden-posts" class="mobile-nav-item">
         <span class="mobile-nav-icon">🙈</span>
-        <span>Hidden</span>
       </router-link>
       <router-link to="/admin/locked-comments" class="mobile-nav-item">
         <span class="mobile-nav-icon">🔒</span>
-        <span>Locked</span>
       </router-link>
       <router-link to="/admin/hidden-users" class="mobile-nav-item">
         <span class="mobile-nav-icon">🚫</span>
-        <span>Blocked</span>
       </router-link>
       <button @click="logout" class="mobile-nav-item logout-btn">
         <span class="mobile-nav-icon">➡️</span>
-        <span>Logout</span>
       </button>
     </nav>
 
@@ -75,6 +77,7 @@
       <!-- 🏠 ADMIN HOME -->
       <div v-if="activeView === 'home'">
         <h1 class="feed-title">All Posts</h1>
+        <!-- ✅ Create Post Button — REMOVED from top-right since we have it in nav now -->
         <div v-if="loading" class="loading-text">Loading...</div>
         <div v-else-if="allPosts.length > 0">
           <div v-for="post in allPosts" :key="post._id" class="post-card">
@@ -113,8 +116,6 @@
               <span v-if="post.isLocked" class="badge-locked">🔒 Comments Locked</span>
               <span v-if="post.isHidden" class="badge-hidden">🙈 Hidden from Public</span>
             </div>
-
-            <!-- ✅ LIKE & COMMENT BUTTONS -->
             <div class="post-actions">
               <button class="action-btn-like" @click="toggleLike(post._id)">
                 ❤️ {{ post.likes?.length || 0 }}
@@ -124,8 +125,6 @@
               </button>
               <button class="action-btn-share" @click="comingSoon">🔁 Share</button>
             </div>
-
-            <!-- ✅ COMMENT INPUT AREA -->
             <div v-if="showCommentInput[post._id]" class="comment-input-area">
               <textarea
                 v-model="commentText[post._id]"
@@ -137,8 +136,6 @@
                 <button class="submit-btn" @click="submitComment(post._id)">Post Comment</button>
               </div>
             </div>
-
-            <!-- ✅ COMMENTS LIST — ADMIN SEES ALL (including hidden!) + TOGGLE BUTTON -->
             <div v-if="post.comments?.length > 0" class="comments-section">
               <div 
                 v-for="(comment, idx) in post.comments" 
@@ -153,7 +150,6 @@
                     <span class="comment-author-name">{{ comment.username || 'User' }}</span>
                     <span class="comment-dot">·</span>
                     <span class="comment-time">{{ formatTime(comment.createdAt) }}</span>
-                    <!-- ✅ ONLY ADMIN SEES THIS BUTTON — ICON CHANGES! -->
                     <button 
                       v-if="isAdmin"
                       class="comment-hide-icon" 
@@ -212,8 +208,6 @@
               <span v-if="post.isLocked" class="badge-locked">🔒 Locked</span>
               <span v-if="post.isHidden" class="badge-hidden">🙈 Hidden</span>
             </div>
-
-            <!-- ✅ LIKE & COMMENT BUTTONS -->
             <div class="post-actions">
               <button class="action-btn-like" @click="toggleLike(post._id)">
                 ❤️ {{ post.likes?.length || 0 }}
@@ -222,8 +216,6 @@
                 💬 {{ post.comments?.length || 0 }}
               </button>
             </div>
-
-            <!-- ✅ COMMENT INPUT AREA -->
             <div v-if="showCommentInput[post._id]" class="comment-input-area">
               <textarea v-model="commentText[post._id]" class="comment-textarea" placeholder="Write a comment..."></textarea>
               <div class="comment-buttons">
@@ -231,8 +223,6 @@
                 <button class="submit-btn" @click="submitComment(post._id)">Post Comment</button>
               </div>
             </div>
-
-            <!-- ✅ COMMENTS LIST — SAME TOGGLE FUNCTIONALITY -->
             <div v-if="post.comments?.length > 0" class="comments-section">
               <div 
                 v-for="(comment, idx) in post.comments" 
@@ -381,7 +371,7 @@ const route = useRoute()
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
 const token = ref(localStorage.getItem('token') || '')
 const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
-const isAdmin = ref(!!currentUser?.isAdmin) // ✅ ADMIN CHECK
+const isAdmin = ref(!!currentUser?.isAdmin)
 
 // ✅ Tab navigation
 const activeView = computed(() => {
@@ -402,7 +392,6 @@ const commentText = ref({})
 
 // ✅ Filter posts that have comments LOCKED
 const lockedPosts = computed(() => allPosts.value.filter(post => post.isLocked))
-
 const searchUser = ref('')
 const allPosts = ref([])
 const allUsers = ref([])
@@ -462,10 +451,8 @@ const toggleLike = async (postId) => {
   const userId = currentUser._id
   const hasLiked = post.likes?.includes(userId)
 
-  // Update locally first
-  if (hasLiked) {
-    post.likes = post.likes.filter(id => id !== userId)
-  } else {
+  if (hasLiked) post.likes = post.likes.filter(id => id !== userId)
+  else {
     if (!post.likes) post.likes = []
     post.likes.push(userId)
   }
@@ -479,7 +466,6 @@ const toggleLike = async (postId) => {
       }
     })
   } catch (err) {
-    // Rollback
     if (hasLiked) post.likes.push(userId)
     else post.likes = post.likes.filter(id => id !== userId)
     alert('Like failed!')
@@ -504,14 +490,12 @@ const submitComment = async (postId) => {
     isHidden: false
   }
 
-  // Update locally
   const post = allPosts.value.find(p => p._id === postId)
   if (post) {
     if (!post.comments) post.comments = []
     post.comments.push(tempComment)
   }
 
-  // Clear & hide
   commentText.value[postId] = ''
   showCommentInput.value[postId] = false
 
@@ -534,10 +518,8 @@ const submitComment = async (postId) => {
 const toggleCommentVisibility = async (postId, commentIndex, currentHidden) => {
   const post = allPosts.value.find(p => p._id === postId)
   if (!post || !post.comments[commentIndex]) return
-  
-  // ✅ Toggle locally FIRST — instant visual feedback!
-  post.comments[commentIndex].isHidden = !currentHidden
 
+  post.comments[commentIndex].isHidden = !currentHidden
   try {
     await fetch(`${API_URL}/posts/toggle-comment-hidden/${postId}/${commentIndex}`, {
       method: 'PATCH',
@@ -547,7 +529,6 @@ const toggleCommentVisibility = async (postId, commentIndex, currentHidden) => {
       }
     })
   } catch (err) {
-    // Rollback on error
     post.comments[commentIndex].isHidden = currentHidden
     alert('Action failed!')
   }
@@ -592,11 +573,13 @@ const toggleHide = async (postId, currentState) => {
 const toggleBlockUser = async (userId, currentState) => {
   alert('Block user route coming soon! 🚀')
 }
+
 const logout = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('user')
   router.push('/login')
 }
+
 const comingSoon = () => {
   alert('This feature is coming soon! 🚀')
 }
