@@ -2402,3 +2402,429 @@ textarea.post-textarea {
   cursor: pointer;
 }
 
+/* ======================================
+   🐦 PROFILE PAGE — TWITTER STYLE POLISHED
+   ====================================== */
+
+.profile-page-wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+/* ✅ HEADER — Avatar + Name + Email */
+.profile-header-section {
+  text-align: center;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.profile-avatar-large {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1d9bf0 0%, #0077d9 100%);
+  color: white;
+  font-size: 48px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  box-shadow: 0 4px 20px rgba(29, 155, 240, 0.35);
+}
+
+.profile-display-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f1419;
+  margin: 0 0 4px;
+}
+
+.profile-handle {
+  font-size: 15px;
+  color: #536471;
+  margin: 0 0 6px;
+}
+
+.profile-email {
+  font-size: 14px;
+  color: #71767b;
+  margin: 0;
+}
+
+/* ✅ STATS — Clean & Modern */
+.profile-stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  padding: 20px 0;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.profile-stat {
+  text-align: center;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.profile-stat:hover {
+  opacity: 0.8;
+}
+
+.stat-number {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f1419;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #536471;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
+}
+
+/* ✅ EDIT BUTTON — Perfect Style */
+.edit-button-wrapper {
+  text-align: center;
+  padding: 20px 0;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.edit-profile-btn {
+  background: #1d9bf0;
+  color: white;
+  border: none;
+  padding: 10px 28px;
+  border-radius: 24px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-profile-btn:hover {
+  background: #1a8cd8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(29, 155, 240, 0.25);
+}
+
+/* ✅ EDIT FORM — Clean & Spacious */
+.edit-form-container {
+  background: #f7f9fa;
+  border-radius: 16px;
+  padding: 24px;
+  margin: 20px 0;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f1419;
+  margin-bottom: 6px;
+}
+
+.form-group label small {
+  font-weight: 400;
+  color: #71767b;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #cfd9de;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #1d9bf0;
+  box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.1);
+}
+
+.form-button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.cancel-btn {
+  flex: 1;
+  padding: 11px;
+  border: 1px solid #cfd9de;
+  background: white;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cancel-btn:hover {
+  background: #f7f9fa;
+}
+
+.save-btn {
+  flex: 1;
+  padding: 11px;
+  border: none;
+  background: #1d9bf0;
+  color: white;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.save-btn:hover {
+  background: #1a8cd8;
+}
+
+/* ✅ TABS — Professional Underline Style */
+.profile-tabs {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 20px;
+  background: none;
+  border: none;
+  font-size: 15px;
+  color: #536471;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover {
+  background: #f7f9fa;
+  color: #0f1419;
+}
+
+.tab-btn.active {
+  color: #1d9bf0;
+  border-bottom: 3px solid #1d9bf0;
+  font-weight: 600;
+}
+
+/* ✅ EMPTY STATE — Beautiful & Inviting */
+.empty-state-container {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.empty-state-container h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f1419;
+  margin: 0 0 8px;
+}
+
+.empty-state-container p {
+  font-size: 15px;
+  color: #536471;
+  margin: 0 0 24px;
+  max-width: 380px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.create-first-post-btn {
+  display: inline-block;
+  background: #1d9bf0;
+  color: white;
+  text-decoration: none;
+  padding: 10px 24px;
+  border-radius: 24px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.create-first-post-btn:hover {
+  background: #1a8cd8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(29, 155, 240, 0.25);
+}
+
+/* ======================================
+   🐦 PROFILE PAGE — TABS FIXED!
+   ====================================== */
+
+.profile-tabs {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 10px;
+  background: none;
+  border: none;
+  font-size: 15px;
+  color: #536471;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s ease;
+  flex: 1;
+  min-height: 52px;
+}
+
+.tab-btn:hover {
+  background: rgba(29, 155, 240, 0.08);
+  color: #0f1419;
+}
+
+.tab-btn.active {
+  color: #1d9bf0;
+  border-bottom: 3px solid #1d9bf0;
+  font-weight: 600;
+  background: transparent;
+}
+
+/* ======================================
+   LIKED POSTS LIST STYLING
+   ====================================== */
+
+.liked-posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.liked-post-card {
+  background: #ffffff;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  padding: 16px 20px;
+  transition: box-shadow 0.2s;
+}
+
+.liked-post-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.liked-post-content {
+  font-size: 15px;
+  line-height: 1.5;
+  color: #0f1419;
+  margin: 0 0 10px;
+  white-space: pre-wrap;
+}
+
+.liked-post-image-wrapper {
+  margin: 10px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.liked-post-image {
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.liked-post-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #536471;
+  padding-top: 10px;
+  border-top: 1px solid #f7f9fa;
+  margin-top: 6px;
+}
+
+/* ======================================
+   ✅ FINAL WORKING VERSION
+   ====================================== */
+
+   /* ✅ Dropdown — Make sure NOTHING blocks clicks */
+   .more-dropdown-menu.dropdown-up {
+     position: absolute !important;
+     bottom: 65px !important;
+     left: 8px !important;
+     right: 8px !important;
+     width: auto !important;
+     max-width: calc(100% - 16px) !important;
+     margin: 0 !important;
+     padding: 8px 0 !important;
+     box-sizing: border-box !important;
+     border-radius: 12px;
+     box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+     border: 1px solid #e6e6e6;
+     background: #ffffff !important;
+     z-index: 99999 !important;
+     display: block !important;
+     visibility: visible !important;
+     opacity: 1 !important;
+   }
+
+   /* ✅ CRITICAL: Make items 100% clickable — NO BLOCKING! */
+   .more-dropdown-menu.dropdown-up .dropdown-item {
+     display: block !important;
+     width: 100% !important;
+     padding: 12px 16px !important;
+     color: #333 !important;
+     text-decoration: none !important;
+     font-size: 15px !important;
+     text-align: left !important;
+     cursor: pointer !important;
+     pointer-events: auto !important; /* ← ENSURES CLICKS WORK */
+     position: relative !important;
+     z-index: 1 !important;
+     box-sizing: border-box !important;
+   }
+
+   .more-dropdown-menu.dropdown-up .dropdown-item:hover {
+     background: #f5f8fa !important;
+     color: #1d9bf0 !important;
+   }
+
+   .more-dropdown-menu.dropdown-up .logout-item {
+     color: #e0245e !important;
+     border-top: 1px solid #eee !important;
+     margin-top: 4px !important;
+     padding-top: 12px !important;
+   }
+
+   html, body {
+     overflow-x: hidden !important;
+     margin: 0 !important;
+     padding: 0 !important;
+     width: 100% !important;
+     box-sizing: border-box !important;
+   }
